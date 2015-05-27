@@ -23,3 +23,5 @@ This project produces only one binary file: `mount.exfat`. To have the full set 
     ln -s mount.exfat mkexfatfs
     ln -s mount.exfat fsck.exfat
     ln -s mount.exfat mkfs.exfat
+##What's next?
+I plan to publish binary files in the Release section, and also my scripts which I use to auto-mount exFAT microSD on boot.
