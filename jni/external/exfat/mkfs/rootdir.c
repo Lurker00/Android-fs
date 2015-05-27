@@ -26,12 +26,12 @@
 #include "cbm.h"
 #include "uctc.h"
 
-static off_t rootdir_alignment(void)
+static off64_t rootdir_alignment(void)
 {
 	return get_cluster_size();
 }
 
-static off_t rootdir_size(void)
+static off64_t rootdir_size(void)
 {
 	return get_cluster_size();
 }

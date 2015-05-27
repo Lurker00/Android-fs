@@ -97,7 +97,7 @@ static void parse_options(struct exfat* ef, const char* options)
 }
 
 static bool verify_vbr_checksum(struct exfat_dev* dev, void* sector,
-		off_t sector_size)
+		off64_t sector_size)
 {
 	uint32_t vbr_checksum;
 	int i;

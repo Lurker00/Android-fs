@@ -48,7 +48,7 @@ void exfat_bug(const char* format, ...)
 	va_end(aq);
 
 #if defined(__ANDROID__)
-	exit(-1);
+    exit(-1);
 #else
 	abort();
 #endif

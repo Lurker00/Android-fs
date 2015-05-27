@@ -23,12 +23,12 @@
 #include "uct.h"
 #include "uctc.h"
 
-static off_t uct_alignment(void)
+static off64_t uct_alignment(void)
 {
 	return get_cluster_size();
 }
 
-static off_t uct_size(void)
+static off64_t uct_size(void)
 {
 	return sizeof(upcase_table);
 }

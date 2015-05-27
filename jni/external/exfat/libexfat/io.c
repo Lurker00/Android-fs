@@ -46,9 +46,9 @@ struct exfat_dev
 {
 	int fd;
 	enum exfat_mode mode;
-	off_t size; /* in bytes */
+	off64_t size; /* in bytes */
 #ifdef USE_UBLIO
-	off_t pos;
+	off64_t pos;
 	ublio_filehandle_t ufh;
 #endif
 };
@@ -287,12 +287,12 @@ enum exfat_mode exfat_get_mode(const struct exfat_dev* dev)
 	return dev->mode;
 }
 
-off_t exfat_get_size(const struct exfat_dev* dev)
+off64_t exfat_get_size(const struct exfat_dev* dev)
 {
 	return dev->size;
 }
 
-off_t exfat_seek(struct exfat_dev* dev, off_t offset, int whence)
+off64_t exfat_seek(struct exfat_dev* dev, off64_t offset, int whence)
 {
 #ifdef USE_UBLIO
 	/* XXX SEEK_CUR will be handled incorrectly */
@@ -329,35 +329,35 @@ ssize_t exfat_write(struct exfat_dev* dev, const void* buffer, size_t size)
 }
 
 ssize_t exfat_pread(struct exfat_dev* dev, void* buffer, size_t size,
-		off_t offset)
+		off64_t offset)
 {
 #ifdef USE_UBLIO
 	return ublio_pread(dev->ufh, buffer, size, offset);
 #elif defined(__ANDROID__)
-	return pread64(dev->fd, buffer, size, offset);
+    return pread64(dev->fd, buffer, size, offset);
 #else
 	return pread(dev->fd, buffer, size, offset);
 #endif
 }
 
 ssize_t exfat_pwrite(struct exfat_dev* dev, const void* buffer, size_t size,
-		off_t offset)
+		off64_t offset)
 {
 #ifdef USE_UBLIO
 	return ublio_pwrite(dev->ufh, buffer, size, offset);
 #elif defined(__ANDROID__)
-	return pwrite64(dev->fd, buffer, size, offset);
+    return pwrite64(dev->fd, buffer, size, offset);
 #else
 	return pwrite(dev->fd, buffer, size, offset);
 #endif
 }
 
 ssize_t exfat_generic_pread(const struct exfat* ef, struct exfat_node* node,
-		void* buffer, size_t size, off_t offset)
+		void* buffer, size_t size, off64_t offset)
 {
 	cluster_t cluster;
 	char* bufp = buffer;
-	off_t lsize, loffset, remainder;
+	off64_t lsize, loffset, remainder;
 
 	if (offset >= node->size)
 		return 0;
@@ -398,11 +398,11 @@ ssize_t exfat_generic_pread(const struct exfat* ef, struct exfat_node* node,
 }
 
 ssize_t exfat_generic_pwrite(struct exfat* ef, struct exfat_node* node,
-		const void* buffer, size_t size, off_t offset)
+		const void* buffer, size_t size, off64_t offset)
 {
 	cluster_t cluster;
 	const char* bufp = buffer;
-	off_t lsize, loffset, remainder;
+	off64_t lsize, loffset, remainder;
 
  	if (offset > node->size)
  		if (exfat_truncate(ef, node, offset, true) != 0)

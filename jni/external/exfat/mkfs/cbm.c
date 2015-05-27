@@ -27,12 +27,12 @@
 #include "uct.h"
 #include "rootdir.h"
 
-static off_t cbm_alignment(void)
+static off64_t cbm_alignment(void)
 {
 	return get_cluster_size();
 }
 
-static off_t cbm_size(void)
+static off64_t cbm_size(void)
 {
 	return DIV_ROUND_UP(
 			(get_volume_size() - get_position(&cbm)) / get_cluster_size(),
