@@ -24,6 +24,11 @@
 #ifndef EXFAT_H_INCLUDED
 #define EXFAT_H_INCLUDED
 
+#if defined(__ANDROID__)
+#define _OFF_T_DEFINED_
+typedef long long off_t;
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
