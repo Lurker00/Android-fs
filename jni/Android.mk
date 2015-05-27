@@ -20,4 +20,4 @@ include \
 	$(LOCAL_PATH)/probe/Android.mk \
 	$(LOCAL_PATH)/external/fuse/Android.mk \
 	$(LOCAL_PATH)/external/exfat/Android.mk \
-	$(LOCAL_PATH)/external/ntfs-3g/Android.mk
+	$(LOCAL_PATH)/ntfs-3g/Android.mk
