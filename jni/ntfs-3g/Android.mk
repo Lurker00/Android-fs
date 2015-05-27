@@ -19,7 +19,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES :=libntfs-3g/acls.c libntfs-3g/attrib.c libntfs-3g/attrlist.c \
 	libntfs-3g/bitmap.c libntfs-3g/bootsect.c libntfs-3g/cache.c libntfs-3g/collate.c \
 	libntfs-3g/compat.c libntfs-3g/compress.c libntfs-3g/debug.c libntfs-3g/device.c \
-	libntfs-3g/dir.c libntfs-3g/efs.c libntfs-3g/index.c libntfs-3g/inode.c \
+	libntfs-3g/dir.c libntfs-3g/ea.c libntfs-3g/efs.c libntfs-3g/index.c libntfs-3g/inode.c libntfs-3g/ioctl.c \
 	libntfs-3g/lcnalloc.c libntfs-3g/logfile.c libntfs-3g/logging.c libntfs-3g/mft.c \
 	libntfs-3g/misc.c libntfs-3g/mst.c libntfs-3g/object_id.c libntfs-3g/reparse.c \
 	libntfs-3g/runlist.c libntfs-3g/security.c libntfs-3g/unistr.c\
