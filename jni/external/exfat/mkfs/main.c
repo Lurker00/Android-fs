@@ -194,7 +194,7 @@ static void usage(const char* prog)
 	exit(1);
 }
 
-int main(int argc, char* argv[])
+int mkexfatfs_main(int argc, char* argv[])
 {
 	const char* spec = NULL;
 	int opt;

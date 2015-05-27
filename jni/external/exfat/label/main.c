@@ -24,7 +24,7 @@
 #include <string.h>
 #include <exfat.h>
 
-int main(int argc, char* argv[])
+int exfatlabel_main(int argc, char* argv[])
 {
 	char** pp;
 	struct exfat ef;
