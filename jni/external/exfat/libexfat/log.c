@@ -47,7 +47,11 @@ void exfat_bug(const char* format, ...)
 		vsyslog(LOG_CRIT, format, aq);
 	va_end(aq);
 
+#if defined(__ANDROID__)
+	exit(-1);
+#else
 	abort();
+#endif
 }
 
 /*
