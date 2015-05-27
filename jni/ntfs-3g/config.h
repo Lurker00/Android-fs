@@ -103,7 +103,7 @@
 #define HAVE_LOCALE_H 1
 
 /* Define to 1 if you have the <machine/endian.h> header file. */
-/* #undef HAVE_MACHINE_ENDIAN_H */
+#define HAVE_MACHINE_ENDIAN_H 1
 
 /* Define to 1 if mbrtowc and mbstate_t are properly declared. */
 #define HAVE_MBRTOWC 1
@@ -121,7 +121,8 @@
 #define HAVE_MEMSET 1
 
 /* Define to 1 if you have the <mntent.h> header file. */
-#define HAVE_MNTENT_H 1
+//#define HAVE_MNTENT_H 1
+#undef HAVE_MNTENT_H
 
 /* Define to 1 if you have the <pwd.h> header file. */
 #define HAVE_PWD_H 1
@@ -241,6 +242,9 @@
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #define HAVE_SYS_STAT_H 1
+#define S_IREAD        S_IRUSR
+#define S_IWRITE       S_IWUSR
+#define S_IEXEC        S_IXUSR
 
 /* Define to 1 if you have the <sys/sysmacros.h> header file. */
 #define HAVE_SYS_SYSMACROS_H 1
@@ -282,7 +286,7 @@
 #define HAVE__BOOL 1
 
 /* Don't update /etc/mtab */
-/* #undef IGNORE_MTAB */
+#define IGNORE_MTAB 1
 
 /* Define to 1 if `lstat' dereferences a symlink specified with a trailing
    slash. */
