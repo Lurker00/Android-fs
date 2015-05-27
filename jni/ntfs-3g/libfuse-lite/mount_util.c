@@ -255,6 +255,7 @@ int fuse_mnt_check_fuseblk(void)
 
 #else /* __SOLARIS__ */
 
+#ifndef IGNORE_MTAB
 static int mtab_needs_update(const char *mnt)
 {
 	int res;
@@ -287,14 +288,17 @@ static int mtab_needs_update(const char *mnt)
 
 	return 1;
 }
+#endif
 
 int fuse_mnt_add_mount(const char *progname, const char *fsname,
                        const char *mnt, const char *type, const char *opts)
 {
     int res;
 
+#ifndef IGNORE_MTAB
     if (!mtab_needs_update(mnt))
         return 0;
+#endif
 
     res = fork();
     if (res == -1) {
@@ -339,6 +343,7 @@ int fuse_mnt_umount(const char *progname, const char *mnt, int lazy)
     int res;
     int status;
 
+#ifndef IGNORE_MTAB
     if (!mtab_needs_update(mnt)) {
         res = umount2(mnt, lazy ? 2 : 0);
         if (res == -1)
@@ -346,6 +351,7 @@ int fuse_mnt_umount(const char *progname, const char *mnt, int lazy)
                     mnt, strerror(errno));
         return res;
     }
+#endif
 
     res = fork();
     if (res == -1) {
