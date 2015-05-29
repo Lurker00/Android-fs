@@ -28,6 +28,12 @@ static int is_exfat(const char*bootsector)
 	return memcmp(bootsector+3,exfat,sizeof exfat)==0;
 }
 
+static int is_fat32(const char*bootsector)
+{
+	static const char fat32[]={'F','A','T','3','2',' ',' ',' '};
+	return memcmp(bootsector+82,fat32,sizeof fat32)==0;
+}
+
 enum{
 	HFS_VH_OFFSET=1024,
 	HFS_VH_SIZE=512,
@@ -209,6 +215,9 @@ int main(int argc,char**argv)
 				tentative_fs="exFAT";
 				if(printf("%s" SEP NO_LABEL SEP,tentative_fs)<0)break;
 				//blkid_fs="take exFAT code from util-linux";
+			}else if(is_fat32(buf)){
+				tentative_fs="VFAT";
+				blkid_fs="vfat";
 			}else{
 				if(printf(UNDETECTED)<0)break;
 			}
