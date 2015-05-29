@@ -112,6 +112,7 @@ struct exfat
 	gid_t gid;
 	int ro;
 	bool noatime;
+	bool sync;
 };
 
 /* in-core nodes iterator */
@@ -166,6 +167,7 @@ cluster_t exfat_next_cluster(const struct exfat* ef,
 cluster_t exfat_advance_cluster(const struct exfat* ef,
 		struct exfat_node* node, uint32_t count);
 int exfat_flush(struct exfat* ef);
+bool exfat_flush_cmap(struct exfat* ef);
 int exfat_truncate(struct exfat* ef, struct exfat_node* node, uint64_t size,
 		bool erase);
 uint32_t exfat_count_free_clusters(const struct exfat* ef);

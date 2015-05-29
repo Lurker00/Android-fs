@@ -165,7 +165,12 @@ static int fuse_exfat_release(const char* path, struct fuse_file_info* fi)
 	   See fuse_exfat_flush() below.
 	*/
 	exfat_debug("[%s] %s", __func__, path);
- 	exfat_flush_node(&ef, get_node(fi));
+	exfat_flush_node(&ef, get_node(fi));
+	//** kis: Android not always unmounts an SD card when it reboots,
+	// leaving FS in a damaged state! Flushing cmap here ensures that
+	// all files written are in correct state.
+	if ( ef.sync )
+		exfat_flush_cmap(&ef);
 	exfat_put_node(&ef, get_node(fi));
 	return 0; /* FUSE ignores this return value */
 }

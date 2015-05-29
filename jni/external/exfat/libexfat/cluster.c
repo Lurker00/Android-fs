@@ -153,6 +153,14 @@ int exfat_flush(struct exfat* ef)
 {
 	int rc = flush_nodes(ef, ef->root);
 
+	if ( !exfat_flush_cmap(ef) )
+		return -EIO;
+
+	return rc;
+}
+
+bool exfat_flush_cmap(struct exfat* ef)
+{
 	if (ef->cmap.dirty)
 	{
 		if (exfat_pwrite(ef->dev, ef->cmap.chunk,
@@ -160,12 +168,11 @@ int exfat_flush(struct exfat* ef)
 				exfat_c2o(ef, ef->cmap.start_cluster)) < 0)
 		{
 			exfat_error("failed to write clusters bitmap");
-			return -EIO;
+			return false;
 		}
 		ef->cmap.dirty = false;
 	}
-
-	return rc;
+	return true;
 }
 
 static bool set_next_cluster(const struct exfat* ef, bool contiguous,
