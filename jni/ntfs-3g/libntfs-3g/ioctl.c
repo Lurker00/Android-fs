@@ -354,8 +354,13 @@ free_out:
 
 #endif /* FITRIM && BLKDISCARD */
 
+#if defined(FITRIM) && defined(BLKDISCARD)
 int ntfs_ioctl(ntfs_inode *ni, int cmd, void *arg __attribute__((unused)),
 			unsigned int flags __attribute__((unused)), void *data)
+#else
+int ntfs_ioctl(ntfs_inode *ni __attribute__((unused)), int cmd, void *arg __attribute__((unused)),
+			unsigned int flags __attribute__((unused)), void *data __attribute__((unused)))
+#endif
 {
 	int ret = 0;
 
