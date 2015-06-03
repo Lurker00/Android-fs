@@ -219,7 +219,7 @@ size_t fuse_dirent_size(size_t namelen)
 }
 
 char *fuse_add_dirent(char *buf, const char *name, const struct stat *stbuf,
-                      off_t off)
+                      off64_t off)
 {
     unsigned namelen = strlen(name);
     unsigned entlen = FUSE_NAME_OFFSET + namelen;
@@ -239,7 +239,7 @@ char *fuse_add_dirent(char *buf, const char *name, const struct stat *stbuf,
 }
 
 size_t fuse_add_direntry(fuse_req_t req, char *buf, size_t bufsize,
-                         const char *name, const struct stat *stbuf, off_t off)
+                         const char *name, const struct stat *stbuf, off64_t off)
 {
     size_t entsize;
 

@@ -471,8 +471,8 @@ void showposix(const struct POSIX_SECURITY*);
 int linux_permissions(const char*, BOOL);
 uid_t linux_owner(const char*);
 gid_t linux_group(const char*);
-int basicread(void*, char*, size_t, off_t);
-int dummyread(void*, char*, size_t, off_t);
+int basicread(void*, char*, size_t, off64_t);
+int dummyread(void*, char*, size_t, off64_t);
 int local_build_mapping(struct MAPPING *[], const char*);
 void newblock(s32);
 void freeblocks(void);
@@ -2268,7 +2268,7 @@ void freeblocks(void)
  */
 
 int basicread(void *fileid, char *buf, size_t size,
-		off_t pos __attribute__((unused)))
+		off64_t pos __attribute__((unused)))
 {
 	return (read(*(int*)fileid, buf, size));
 }
@@ -2280,11 +2280,11 @@ int basicread(void *fileid, char *buf, size_t size,
  */
 
 int dummyread(void *fileid  __attribute__((unused)),
-		char *buf, size_t size, off_t pos)
+		char *buf, size_t size, off64_t pos)
 {
 	size_t sz;
 
-	if (pos >= (off_t)(sizeof(dummymapping) - 1))
+	if (pos >= (off64_t)(sizeof(dummymapping) - 1))
 		sz = 0;
 	else
 		if ((size + pos) >= (sizeof(dummymapping) - 1))

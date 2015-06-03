@@ -656,7 +656,7 @@ static s64 is_critical_metadata(ntfs_walk_clusters_ctx *image, runlist *rl)
 	return 0;
 }
 
-static off_t tellin(int in)
+static off64_t tellin(int in)
 {
 	return (lseek(in, 0, SEEK_CUR));
 }
@@ -699,17 +699,17 @@ static int io_all(void *fd, void *buf, int count, int do_write)
 }
 
 
-static void rescue_sector(void *fd, u32 bytes_per_sector, off_t pos, void *buff)
+static void rescue_sector(void *fd, u32 bytes_per_sector, off64_t pos, void *buff)
 {
 	const char badsector_magic[] = "BadSectoR";
 	struct ntfs_device *dev = fd;
 
 	if (opt.restore_image) {
 		if (!opt.no_action
-		    && (lseek(*(int *)fd, pos, SEEK_SET) == (off_t)-1))
+		    && (lseek(*(int *)fd, pos, SEEK_SET) == (off64_t)-1))
 			perr_exit("lseek");
 	} else {
-		if (vol->dev->d_ops->seek(dev, pos, SEEK_SET) == (off_t)-1)
+		if (vol->dev->d_ops->seek(dev, pos, SEEK_SET) == (off64_t)-1)
 			perr_exit("seek input");
 	}
 
@@ -728,7 +728,7 @@ static void rescue_sector(void *fd, u32 bytes_per_sector, off_t pos, void *buff)
 static void read_rescue(void *fd, char *buff, u32 csize, u32 bytes_per_sector,
 				u64 rescue_lcn)
 {
-	off_t rescue_pos;
+	off64_t rescue_pos;
 
 	if (read_all(fd, buff, csize) == -1) {
 
@@ -737,7 +737,7 @@ static void read_rescue(void *fd, char *buff, u32 csize, u32 bytes_per_sector,
 		else if (opt.rescue){
 			u32 i;
 
-			rescue_pos = (off_t)(rescue_lcn * csize);
+			rescue_pos = (off64_t)(rescue_lcn * csize);
 			for (i = 0; i < csize; i += bytes_per_sector)
 				rescue_sector(fd, bytes_per_sector,
 						rescue_pos + i, buff + i);
@@ -755,7 +755,7 @@ static void copy_cluster(int rescue, u64 rescue_lcn, u64 lcn)
 	s32 csize = le32_to_cpu(image_hdr.cluster_size);
 	BOOL backup_bootsector;
 	void *fd = (void *)&fd_in;
-	off_t rescue_pos;
+	off64_t rescue_pos;
 	NTFS_BOOT_SECTOR *bs;
 	le64 mask;
 	static u16 bytes_per_sector = NTFS_SECTOR_SIZE;
@@ -766,7 +766,7 @@ static void copy_cluster(int rescue, u64 rescue_lcn, u64 lcn)
 		fd = vol->dev;
 	}
 
-	rescue_pos = (off_t)(rescue_lcn * csize);
+	rescue_pos = (off64_t)(rescue_lcn * csize);
 
 		/* possible partial cluster holding the backup boot sector */
 	backup_bootsector = (lcn + 1)*csize >= full_device_size;
@@ -867,17 +867,17 @@ static s64 lseek_out(int fd, s64 pos, int mode)
 
 static void lseek_to_cluster(s64 lcn)
 {
-	off_t pos;
+	off64_t pos;
 
-	pos = (off_t)(lcn * vol->cluster_size);
+	pos = (off64_t)(lcn * vol->cluster_size);
 
-	if (vol->dev->d_ops->seek(vol->dev, pos, SEEK_SET) == (off_t)-1)
+	if (vol->dev->d_ops->seek(vol->dev, pos, SEEK_SET) == (off64_t)-1)
 		perr_exit("lseek input");
 
 	if (opt.std_out || opt.save_image || opt.metadata_image)
 		return;
 
-	if (lseek_out(fd_out, pos, SEEK_SET) == (off_t)-1)
+	if (lseek_out(fd_out, pos, SEEK_SET) == (off64_t)-1)
 			perr_exit("lseek output");
 }
 
@@ -1065,7 +1065,7 @@ static void restore_image(void)
 				else {
 					if (!opt.no_action
 					    && (lseek_out(fd_out, count * csize,
-							SEEK_CUR) == (off_t)-1))
+							SEEK_CUR) == (off64_t)-1))
 						perr_exit("restore_image: lseek");
 				}
 			}

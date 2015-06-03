@@ -569,7 +569,7 @@ s64 ntfs_device_size_get(struct ntfs_device *dev, int block_size)
 #ifdef DIOCGMEDIASIZE
 	{
 		/* FreeBSD */
-		off_t size;
+		off64_t size;
 
 		if (dev->d_ops->ioctl(dev, DIOCGMEDIASIZE, &size) >= 0) {
 			ntfs_log_debug("DIOCGMEDIASIZE nr bytes = %llu (0x%llx)\n",

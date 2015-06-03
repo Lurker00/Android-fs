@@ -392,12 +392,12 @@ extern int   ntfs_attr_remove(ntfs_inode *ni, const ATTR_TYPES type,
 extern s64   ntfs_attr_get_free_bits(ntfs_attr *na);
 extern int ntfs_attr_data_read(ntfs_inode *ni,
 		ntfschar *stream_name, int stream_name_len,
-		char *buf, size_t size, off_t offset);
+		char *buf, size_t size, off64_t offset);
 extern int ntfs_attr_data_write(ntfs_inode *ni,
 		ntfschar *stream_name, int stream_name_len,
-		const char *buf, size_t size, off_t offset);
+		const char *buf, size_t size, off64_t offset);
 extern int ntfs_attr_shrink_size(ntfs_inode *ni, ntfschar *stream_name,
-		int stream_name_len, off_t offset);
+		int stream_name_len, off64_t offset);
 
 #endif /* defined _NTFS_ATTRIB_H */
 

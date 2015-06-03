@@ -924,7 +924,7 @@ static s64 ntfs_rlwrite(struct ntfs_device *dev, const runlist *rl,
 			delta -= length;
 		}
 		if (dev->d_ops->seek(dev, rl[i].lcn * g_vol->cluster_size,
-				SEEK_SET) == (off_t)-1)
+				SEEK_SET) == (off64_t)-1)
 			return -1LL;
 		retry = 0;
 		do {
@@ -4183,7 +4183,7 @@ static BOOL mkntfs_fill_device_with_zeroes(void)
 				position / progress_inc);
 			/* Seek to next cluster. */
 			g_vol->dev->d_ops->seek(g_vol->dev,
-					((off_t)position + 1) *
+					((off64_t)position + 1) *
 					g_vol->cluster_size, SEEK_SET);
 		}
 	}
@@ -4339,7 +4339,7 @@ static int create_backup_boot_sector(u8 *buff)
 	if (size < opts.sector_size)
 		size = opts.sector_size;
 	if (g_vol->dev->d_ops->seek(g_vol->dev, (opts.num_sectors + 1) *
-			opts.sector_size - size, SEEK_SET) == (off_t)-1) {
+			opts.sector_size - size, SEEK_SET) == (off64_t)-1) {
 		ntfs_log_perror("Seek failed");
 		goto bb_err;
 	}

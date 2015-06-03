@@ -17,7 +17,7 @@ int fuse_mnt_check_fuseblk(void);
 #ifdef __SOLARIS__
 
 int fuse_mnt_check_empty(const char *progname, const char *mnt,
-			 mode_t rootmode, off_t rootsize);
+			 mode_t rootmode, off64_t rootsize);
 
 #else /* __SOLARIS__ */
 

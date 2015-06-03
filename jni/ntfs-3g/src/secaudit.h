@@ -657,7 +657,7 @@ struct group {
 	gid_t gr_gid;
 } ;
 
-typedef int (*FILEREADER)(void *fileid, char *buf, size_t size, off_t pos);
+typedef int (*FILEREADER)(void *fileid, char *buf, size_t size, off64_t pos);
 
 /*
  *		Data defined in secaudit.c

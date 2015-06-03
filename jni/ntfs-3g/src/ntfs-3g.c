@@ -1133,7 +1133,7 @@ static int ntfs_fuse_opendir(const char *path,
 #endif
 
 static int ntfs_fuse_readdir(const char *path, void *buf,
-		fuse_fill_dir_t filler, off_t offset __attribute__((unused)),
+		fuse_fill_dir_t filler, off64_t offset __attribute__((unused)),
 		struct fuse_file_info *fi __attribute__((unused)))
 {
 	ntfs_fuse_fill_context_t fill_ctx;
@@ -1233,7 +1233,7 @@ static int ntfs_fuse_open(const char *org_path,
 }
 
 static int ntfs_fuse_read(const char *org_path, char *buf, size_t size,
-		off_t offset, struct fuse_file_info *fi __attribute__((unused)))
+		off64_t offset, struct fuse_file_info *fi __attribute__((unused)))
 {
 	ntfs_inode *ni = NULL;
 	ntfs_attr *na = NULL;
@@ -1269,7 +1269,7 @@ static int ntfs_fuse_read(const char *org_path, char *buf, size_t size,
 		max_read = ((na->data_size+511) & ~511) + 2;
 	}
 #endif /* HAVE_SETXATTR */
-	if (offset + (off_t)size > max_read) {
+	if (offset + (off64_t)size > max_read) {
 		if (max_read < offset)
 			goto ok;
 		size = max_read - offset;
@@ -1303,7 +1303,7 @@ exit:
 }
 
 static int ntfs_fuse_write(const char *org_path, const char *buf, size_t size,
-		off_t offset, struct fuse_file_info *fi __attribute__((unused)))
+		off64_t offset, struct fuse_file_info *fi __attribute__((unused)))
 {
 	ntfs_inode *ni = NULL;
 	ntfs_attr *na = NULL;
@@ -1410,7 +1410,7 @@ out:
  *	Common part for truncate() and ftruncate()
  */
 
-static int ntfs_fuse_trunc(const char *org_path, off_t size,
+static int ntfs_fuse_trunc(const char *org_path, off64_t size,
 #if !KERNELPERMS | (POSIXACLS & !KERNELACLS)
 			BOOL chkwrite)
 #else
@@ -1486,12 +1486,12 @@ exit:
 	return res;
 }
 
-static int ntfs_fuse_truncate(const char *org_path, off_t size)
+static int ntfs_fuse_truncate(const char *org_path, off64_t size)
 {
 	return ntfs_fuse_trunc(org_path, size, TRUE);
 }
 
-static int ntfs_fuse_ftruncate(const char *org_path, off_t size,
+static int ntfs_fuse_ftruncate(const char *org_path, off64_t size,
 			struct fuse_file_info *fi __attribute__((unused)))
 {
 	/*

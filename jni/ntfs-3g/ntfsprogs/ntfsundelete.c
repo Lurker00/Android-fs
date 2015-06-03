@@ -2137,7 +2137,7 @@ static int undelete_file(ntfs_volume *vol, long long inode)
 				if (d->percent == 100 && d->size_alloc >= d->size_data &&
 					(d->size_alloc - d->size_data) <= (long long)vol->cluster_size &&
 					cluster_count * (long long)vol->cluster_size == d->size_alloc) {
-					if (ftruncate(fd, (off_t)d->size_data))
+					if (ftruncate(fd, (off64_t)d->size_data))
 						ntfs_log_perror("Truncation failed");
 				} else ntfs_log_quiet("Truncation not performed because file has an "
 					"inconsistent $MFT record.\n");

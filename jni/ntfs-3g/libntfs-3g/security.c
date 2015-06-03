@@ -436,7 +436,7 @@ static INDEX_ENTRY *ntfs_ie_get_first(INDEX_HEADER *ih)
  *	file. Stuffing is just a way to get to the same result.
  */
 
-static int entersecurity_stuff(ntfs_volume *vol, off_t offs)
+static int entersecurity_stuff(ntfs_volume *vol, off64_t offs)
 {
 	int res;
 	int written;
@@ -478,7 +478,7 @@ static int entersecurity_stuff(ntfs_volume *vol, off_t offs)
 
 static int entersecurity_data(ntfs_volume *vol,
 			const SECURITY_DESCRIPTOR_RELATIVE *attr, s64 attrsz,
-			le32 hash, le32 keyid, off_t offs, int gap)
+			le32 hash, le32 keyid, off64_t offs, int gap)
 {
 	int res;
 	int written1;
@@ -543,7 +543,7 @@ static int entersecurity_data(ntfs_volume *vol,
  */
 
 static int entersecurity_indexes(ntfs_volume *vol, s64 attrsz,
-			le32 hash, le32 keyid, off_t offs)
+			le32 hash, le32 keyid, off64_t offs)
 {
 	union {
 		struct {
@@ -634,7 +634,7 @@ static le32 entersecurityattr(ntfs_volume *vol,
 	le32 securid;
 	le32 keyid;
 	u32 newkey;
-	off_t offs;
+	off64_t offs;
 	int gap;
 	int size;
 	BOOL found;
@@ -4273,7 +4273,7 @@ static int ntfs_default_mapping(struct SECURITY_CONTEXT *scx)
  *		Basic read from a user mapping file on another volume
  */
 
-static int basicread(void *fileid, char *buf, size_t size, off_t offs __attribute__((unused)))
+static int basicread(void *fileid, char *buf, size_t size, off64_t offs __attribute__((unused)))
 {
 	return (read(*(int*)fileid, buf, size));
 }
@@ -4283,7 +4283,7 @@ static int basicread(void *fileid, char *buf, size_t size, off_t offs __attribut
  *		Read from a user mapping file on current NTFS partition
  */
 
-static int localread(void *fileid, char *buf, size_t size, off_t offs)
+static int localread(void *fileid, char *buf, size_t size, off64_t offs)
 {
 	return (ntfs_attr_data_read((ntfs_inode*)fileid,
 			AT_UNNAMED, 0, buf, size, offs));

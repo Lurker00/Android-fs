@@ -4189,7 +4189,7 @@ static SID *encodesid(const char *sidstr)
  */
 
 static struct MAPLIST *getmappingitem(FILEREADER reader, void *fileid,
-		off_t *poffs, char *buf, int *psrc, s64 *psize)
+		off64_t *poffs, char *buf, int *psrc, s64 *psize)
 {
 	int src;
 	int dst;
@@ -4276,13 +4276,13 @@ struct MAPLIST *ntfs_read_mapping(FILEREADER reader, void *fileid)
 	struct MAPLIST *firstitem;
 	struct MAPLIST *lastitem;
 	int src;
-	off_t offs;
+	off64_t offs;
 	s64 size;
 
 	firstitem = (struct MAPLIST*)NULL;
 	lastitem = (struct MAPLIST*)NULL;
 	offs = 0;
-	size = reader(fileid, buf, (size_t)BUFSZ, (off_t)0);
+	size = reader(fileid, buf, (size_t)BUFSZ, (off64_t)0);
 	if (size > 0) {
 		src = 0;
 		do {

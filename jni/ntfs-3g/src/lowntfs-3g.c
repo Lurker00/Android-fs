@@ -1159,7 +1159,7 @@ static void ntfs_fuse_releasedir(fuse_req_t req,
 }
 
 static void ntfs_fuse_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
-			off_t off __attribute__((unused)),
+			off64_t off __attribute__((unused)),
 			struct fuse_file_info *fi __attribute__((unused)))
 {
 	ntfs_fuse_fill_item_t *first;
@@ -1311,7 +1311,7 @@ static void ntfs_fuse_open(fuse_req_t req, fuse_ino_t ino,
 }
 
 static void ntfs_fuse_read(fuse_req_t req, fuse_ino_t ino, size_t size,
-			off_t offset,
+			off64_t offset,
 			struct fuse_file_info *fi __attribute__((unused)))
 {
 	ntfs_inode *ni = NULL;
@@ -1351,7 +1351,7 @@ static void ntfs_fuse_read(fuse_req_t req, fuse_ino_t ino, size_t size,
 		max_read = ((na->data_size+511) & ~511) + 2;
 	}
 #endif /* HAVE_SETXATTR */
-	if (offset + (off_t)size > max_read) {
+	if (offset + (off64_t)size > max_read) {
 		if (max_read < offset)
 			goto ok;
 		size = max_read - offset;
@@ -1386,7 +1386,7 @@ exit:
 }
 
 static void ntfs_fuse_write(fuse_req_t req, fuse_ino_t ino, const char *buf, 
-			size_t size, off_t offset,
+			size_t size, off64_t offset,
 			struct fuse_file_info *fi __attribute__((unused)))
 {
 	ntfs_inode *ni = NULL;
@@ -1555,9 +1555,9 @@ static int ntfs_fuse_chownmod(struct SECURITY_CONTEXT *scx, fuse_ino_t ino,
 
 static int ntfs_fuse_trunc(struct SECURITY_CONTEXT *scx, fuse_ino_t ino, 
 #if !KERNELPERMS | (POSIXACLS & !KERNELACLS)
-		off_t size, BOOL chkwrite, struct stat *stbuf)
+		off64_t size, BOOL chkwrite, struct stat *stbuf)
 #else
-		off_t size, BOOL chkwrite __attribute__((unused)),
+		off64_t size, BOOL chkwrite __attribute__((unused)),
 		struct stat *stbuf)
 #endif
 {
