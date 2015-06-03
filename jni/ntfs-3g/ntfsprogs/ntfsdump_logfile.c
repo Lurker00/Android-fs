@@ -266,7 +266,11 @@ static int logfile_pread(logfile_file *logfile, int ofs, int count, u8 *buf)
 	if (logfile->is_volume) {
 		br = (int)ntfs_attr_pread(logfile->na, ofs, count, buf);
 	} else {
+#if defined(__ANDROID__)
+		if (lseek64(logfile->fd, ofs, SEEK_SET)==-1) {
+#else
 		if (lseek(logfile->fd, ofs, SEEK_SET)==-1) {
+#endif
 			ntfs_log_error("Could not seek to offset %u\n", ofs);
 			return 0;
 		}
