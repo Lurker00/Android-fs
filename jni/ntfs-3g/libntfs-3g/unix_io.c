@@ -223,7 +223,11 @@ static int ntfs_device_unix_io_close(struct ntfs_device *dev)
 static s64 ntfs_device_unix_io_seek(struct ntfs_device *dev, s64 offset,
 		int whence)
 {
+#if defined(__ANDROID__)
+	return lseek64(DEV_FD(dev), offset, whence);
+#else
 	return lseek(DEV_FD(dev), offset, whence);
+#endif
 }
 
 /**
@@ -277,7 +281,11 @@ static s64 ntfs_device_unix_io_write(struct ntfs_device *dev, const void *buf,
 static s64 ntfs_device_unix_io_pread(struct ntfs_device *dev, void *buf,
 		s64 count, s64 offset)
 {
+#if defined(__ANDROID__)
+	return pread64(DEV_FD(dev), buf, count, offset);
+#else
 	return pread(DEV_FD(dev), buf, count, offset);
+#endif
 }
 
 /**
@@ -299,7 +307,11 @@ static s64 ntfs_device_unix_io_pwrite(struct ntfs_device *dev, const void *buf,
 		return -1;
 	}
 	NDevSetDirty(dev);
+#if defined(__ANDROID__)
+	return pwrite64(DEV_FD(dev), buf, count, offset);
+#else
 	return pwrite(DEV_FD(dev), buf, count, offset);
+#endif
 }
 
 /**
