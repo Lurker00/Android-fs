@@ -11,14 +11,15 @@ I provide binaries for armeabi, armeabi-v7a and x86, along with a mounting scrip
 ##How to mount?
 The primary goal is auto-mount of the microSD card on Android boot, with full functionality. Unmount can be done from the Android Settings. Re-mount after the boot is possible, but currently is a bit tricky (see below).
 
-Probably, it is possible to create a CWM Recovery zip archive to avoid manual installation, but I've yet to learn how to do it. Currently, to install all this stuff, you need to root your device. If you have done, you already have SuperSU installed, and, as a result, `/system/etc/install-recovery-2.sh` (if exists) is executed on every boot by SuperSU. I've provided one in the `mount` directory of the project. It checks if the file system is supported, then tries to mount the external microSD. It appends a log file at `/data/local/tmp/exfat_mount.log`. You may disable it by setting the `logfile` to `/dev/null` in the script. The script expect the following executable binaries with permissions to run at `/system/xbin`:
+Probably, it is possible to create a CWM Recovery zip archive to avoid manual installation, but I've yet to learn how to do it. Currently, to install all this stuff, you need to root your device. If you have done, you already have SuperSU installed, and, as a result, `/system/etc/install-recovery-2.sh` (if exists) is executed on every boot by SuperSU. I've provided one in the `mount` directory of the project, and in the [Release](https://github.com/Lurker00/Android-fs/releases) packages. The script checks if the file system is supported, then tries to mount the external microSD. It appends a log file at `/data/local/tmp/exfat_mount.log`. You may disable it by setting the `logfile` to `/dev/null` in the script. The script expect the following executable binaries with permissions to run at `/system/xbin`:
 * `probe` (to detect the file system type)
 * `mount.exfat`
 * `ntfs-3g`
 * `ntfsfix`
  
 I hope other commands it uses are available in the shell of your device.
-It creates the links for exFAT tools, if required. It checks the file system before mounting, and mounts it read-only if it found errors. It does not fix the errors found: please use Windows or your OS tools to correct the errors.
+
+The script creates the links for exFAT tools, if required. It checks the file system before mounting, and mounts it read-only if it has found errors. It does not fix the errors found: please use Windows or your OS tools to correct the file system errors.
 
 **NOTE:** the script sets SELinux to Permissive mode! Instead, the mount would be read-only. If you know how to overcome it, please let me know.
 
