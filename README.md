@@ -4,7 +4,7 @@
 
 The primary goal of this project was to build the drivers for Lenovo Yoga Tablet 2 8'' 830L (firmware upgraded to 830LC) tablet, which utilizes Intel Atom (x86) CPU and runs Android 4.4.2. There are some ARM builds of these drivers over there, but I found nothing for x86. Also, I failed to find a ready-to-build project with up-to-date source code.
  
-I spent (hope - not wasted!) some time to commit it step by step, starting from original sources, with all further add-ons and modifications commented, for easy repeat from more recent sources, or to merge in an update.
+I spent (hope - not wasted!) some time to commit it step by step, starting from original sources, with all further add-ons and modifications commented, for easy repeat for more recent sources, or to merge in an update.
 
 I provide binaries for armeabi, armeabi-v7a and x86, along with a mounting script, in the [Releases](https://github.com/Lurker00/Android-fs/releases).
 
