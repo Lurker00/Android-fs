@@ -9,7 +9,7 @@ I spent (hope - not wasted!) some time to commit it step by step, starting from 
 I provide binaries for armeabi, armeabi-v7a and x86, along with a mounting script, in the [Releases](https://github.com/Lurker00/Android-fs/releases).
 
 ##How to mount?
-The primary goal is auto-mount of the microSD card on Android boot, with full functionality. Unmount and re-mount after the boot is possible, but currently is a bit tricky.
+The primary goal is auto-mount of the microSD card on Android boot, with full functionality. Unmount can be done from the Android Settings. Re-mount after the boot is possible, but currently is a bit tricky (see below).
 
 Probably, it is possible to create a CWM Recovery zip archive to avoid manual installation, but I've yet to learn how to do it. Currently, to install all this stuff, you need to root your device. If you have done, you already have SuperSU installed, and, as a result, `/system/etc/install-recovery-2.sh` (if exists) is executed on every boot by SuperSU. I've provided one in the `mount` directory of the project. It checks if the file system is supported, then tries to mount the external microSD. It appends a log file at `/data/local/tmp/exfat_mount.log`. You may disable it by setting the `logfile` to `/dev/null` in the script. The script expect the following executable binaries with permissions to run at `/system/xbin`:
 * `probe` (to detect the file system type)
