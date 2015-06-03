@@ -58,7 +58,8 @@
 #define HAVE_FEATURES_H 1
 
 /* Define to 1 if you have the `ffs' function. */
-#define HAVE_FFS 1
+//** kis: NDK r10b has missing ffs() in x86 libc.a :(
+//#define HAVE_FFS 1
 
 /* Define to 1 if you have the `fork' function. */
 #define HAVE_FORK 1
