@@ -29,15 +29,15 @@ The `/system/etc/install-recovery-2.sh` script can be executed manually, from a 
 
 Of course, I've checked all above, and it works just fine on my particular device, though it does not mean it will work for you!
 
-##How to build.
+##How to build
 Build process of this project is rather straightforward:
 
 1. Install Android NDK for your platform (I use Windows 7 64-bit/Cygwin, NDK r10b).
 2. Checkout or download and unpack the source code.
 3. Run `ndk-build` in the root directory of the source code tree.
 
-##Notes on exFAT driver build.
+##Notes on exFAT driver build
 Please read [here](https://github.com/Lurker00/Android-fs/blob/master/jni/external/exfat/README.md).
 
-##Notes on NTFS driver build.
+##Notes on NTFS driver build
 Please read [here](https://github.com/Lurker00/Android-fs/blob/master/jni/ntfs-3g/README.md)
