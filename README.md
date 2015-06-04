@@ -37,16 +37,7 @@ Build process of this project is rather straightforward:
 3. Run `ndk-build` in the root directory of the source code tree.
 
 ##Notes on exFAT driver build
-Based on [exfat 1.1.1 r422 sources](https://code.google.com/p/exfat/source/list).
-This project produces only one binary file: `mount.exfat`. To have the full set of exFAT utilities, and/or for applications that expect other executable names, you have to run all or some of the following commands:
-
-    ln -s mount.exfat mount.exfat-fuse
-    ln -s mount.exfat dumpexfat
-    ln -s mount.exfat exfatfsck
-    ln -s mount.exfat exfatlabel
-    ln -s mount.exfat mkexfatfs
-    ln -s mount.exfat fsck.exfat
-    ln -s mount.exfat mkfs.exfat
+Please read [here](https://github.com/Lurker00/Android-fs/blob/master/jni/external/exfat/README.md).
 
 ##Notes on NTFS driver build.
-Based on [ntfs-3g version 2015.3.14 from Tuxera](http://www.tuxera.com/community/open-source-ntfs-3g/). I've built only `ntfs-3g`, `ntfsfix` and `mkntfs`, but didn't test the latter. Other tools may require similar modifications to build and run. I need only `ntfs-3g` and `ntfsfix` (with -n option only) for my particular tasks.
+Please read [here](https://github.com/Lurker00/Android-fs/blob/master/jni/ntfs-3g/README.md)
