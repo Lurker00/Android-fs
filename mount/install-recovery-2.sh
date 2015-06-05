@@ -78,9 +78,18 @@ if [ $? != 0 ]; then
 fi
 echo "$mnt_cmd" >> $logfile
 
-# ***** Turn SELinux to Permissive. Instead, our mounts would be RO for others.
 if [ -e /sys/fs/selinux/enforce ]; then
-	setenforce 0
+	if [ -e /system/xbin/supolicy ]; then
+# ***** Set permissions for fuse. Instead, our mounts would be RO for others.
+		echo "Using supolicy to provide permissions to fuse." >> $logfile
+		/system/xbin/supolicy --live "allow sdcardd unlabeled dir { append create execute write relabelfrom link unlink ioctl getattr setattr read rename lock mounton quotaon swapon rmdir audit_access remove_name add_name reparent execmod search open }"
+		/system/xbin/supolicy --live "allow sdcardd unlabeled file { append create write relabelfrom link unlink ioctl getattr setattr read rename lock mounton quotaon swapon audit_access open }"
+		/system/xbin/supolicy --live "allow unlabeled unlabeled filesystem associate"
+	else
+# ***** Turn SELinux to Permissive. Instead, our mounts would be RO for others.
+		echo "Using setenforce 0 to provide permissions to fuse." >> $logfile
+		setenforce 0
+	fi
 fi
 
 # ***** Just in case, and it would work only on boot.
