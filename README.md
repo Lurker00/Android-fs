@@ -24,7 +24,9 @@ The script creates the links for exFAT tools, if required. It checks the file sy
 **NOTE:** If there is no `/system/xbin/supolicy` (provided by SuperUS), the script sets SELinux to Permissive mode! Instead, the mount would be read-only. If you know how to overcome it, please let me know.
 
 The `/system/etc/install-recovery-2.sh` script can be executed manually, from a terminal, e.g. to re-mount without system restart. For this particular purpose, please run it with any parameter, e.g.
+
     /system/etc/install-recovery-2.sh mount
+
 (`mount` is just for example: any parameter!). Then, the script uses `debuggerd` replacement technology to mount from `init` process.
 
 Of course, I've checked all above, and it works just fine on my particular device, though it does not mean it will work for you!
