@@ -16,7 +16,8 @@ I provide binaries for armeabi, armeabi-v7a and x86, along with a mounting scrip
 3. Removed `mkntfs` from the package.
 
 ###1.0.0
-First public release
+First public release.
+
 ##How to mount?
 The primary goal is auto-mount of the microSD card on Android boot, with full functionality. Unmount can be done from the Android Settings. Re-mount after the boot is possible, but currently is a bit tricky (see below).
 
