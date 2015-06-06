@@ -4,4 +4,4 @@
 3. Removed `mkntfs` from the package.
 
 ###1.0.0
-First public release
+First public release.
