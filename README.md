@@ -8,6 +8,14 @@ I spent (hope - not wasted!) some time to commit it step by step, starting from 
 
 I provide binaries for armeabi, armeabi-v7a and x86, along with a mounting script, in the [Releases](https://github.com/Lurker00/Android-fs/releases).
 
+##History
+
+###1.0.1
+1. Mount script uses `supolicy`, if available, for SELinux permissions, with fallback to `setenforce 0`, if `supolicy` is not found.
+2. Moved the mounting script into `common` folder of the release package.
+
+###1.0.0
+First public release
 ##How to mount?
 The primary goal is auto-mount of the microSD card on Android boot, with full functionality. Unmount can be done from the Android Settings. Re-mount after the boot is possible, but currently is a bit tricky (see below).
 
