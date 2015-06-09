@@ -54,15 +54,16 @@ LOCAL_MODULE_TAGS := eng
 LOCAL_STATIC_LIBRARIES := libfuse-lite libntfs-3g-lib
 include $(BUILD_EXECUTABLE)
 
-# ntfsprogs - mkntfs
-include $(CLEAR_VARS)
-LOCAL_SRC_FILES := ntfsprogs/attrdef.c ntfsprogs/boot.c ntfsprogs/sd.c ntfsprogs/mkntfs.c ntfsprogs/utils.c
-
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/include/fuse-lite $(LOCAL_PATH)/include/ntfs-3g \
-			$(LOCAL_PATH)/androidglue/include $(LOCAL_PATH)/ntfsprogs/ \
-			external/e2fsprogs/lib
-LOCAL_CFLAGS := $(CC_OPTIONS)
-LOCAL_MODULE := mkntfs
-LOCAL_MODULE_TAGS := eng
-LOCAL_STATIC_LIBRARIES := libfuse-lite libntfs-3g-lib
-include $(BUILD_EXECUTABLE)
+#** No need for mkntfs on Android
+## ntfsprogs - mkntfs
+#include $(CLEAR_VARS)
+#LOCAL_SRC_FILES := ntfsprogs/attrdef.c ntfsprogs/boot.c ntfsprogs/sd.c ntfsprogs/mkntfs.c ntfsprogs/utils.c
+#
+#LOCAL_C_INCLUDES := $(LOCAL_PATH)/include/fuse-lite $(LOCAL_PATH)/include/ntfs-3g \
+#			$(LOCAL_PATH)/androidglue/include $(LOCAL_PATH)/ntfsprogs/ \
+#			external/e2fsprogs/lib
+#LOCAL_CFLAGS := $(CC_OPTIONS)
+#LOCAL_MODULE := mkntfs
+#LOCAL_MODULE_TAGS := eng
+#LOCAL_STATIC_LIBRARIES := libfuse-lite libntfs-3g-lib
+#include $(BUILD_EXECUTABLE)
