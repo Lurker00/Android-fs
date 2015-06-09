@@ -1,7 +1,7 @@
 #!/system/bin/sh
 
 logfile=/data/local/tmp/exfat_mount.log
-#logfile=/sdcard/exfat_mount.log
+#logfile=/dev/null
 
 echo '******' $(date) '******' >> $logfile
 echo 'id: ' $(id) >> $logfile 2>&1
