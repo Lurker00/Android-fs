@@ -1,0 +1,158 @@
+#!/sbin/sh
+#
+# exFAT & NTFS installer ZIP 
+# Copyright (c) 2015 Lurker <lurker@id.ru>
+#
+# Most of the functionality was taken from SuperSU installer by Chainfire
+#
+
+OUTFD=$2
+ZIP=$3
+
+SYSTEMLIB=/system/lib
+
+ui_print() {
+  echo -n -e "ui_print $1\n" > /proc/self/fd/$OUTFD
+  echo -n -e "ui_print\n"    > /proc/self/fd/$OUTFD
+}
+
+ch_con() {
+  LD_LIBRARY_PATH=$SYSTEMLIB /system/toolbox chcon -h u:object_r:system_file:s0 $1
+  LD_LIBRARY_PATH=$SYSTEMLIB /system/bin/toolbox chcon -h u:object_r:system_file:s0 $1
+  chcon -h u:object_r:system_file:s0 $1
+  LD_LIBRARY_PATH=$SYSTEMLIB /system/toolbox chcon u:object_r:system_file:s0 $1
+  LD_LIBRARY_PATH=$SYSTEMLIB /system/bin/toolbox chcon u:object_r:system_file:s0 $1
+  chcon u:object_r:system_file:s0 $1
+}
+
+ch_con_ext() {
+  LD_LIBRARY_PATH=$SYSTEMLIB /system/toolbox chcon $2 $1
+  LD_LIBRARY_PATH=$SYSTEMLIB /system/bin/toolbox chcon $2 $1
+  chcon $2 $1
+}
+
+ln_con() {
+  LD_LIBRARY_PATH=$SYSTEMLIB /system/toolbox ln -s $1 $2
+  LD_LIBRARY_PATH=$SYSTEMLIB /system/bin/toolbox ln -s $1 $2
+  ln -s $1 $2
+  ch_con $2
+}
+
+set_perm() {
+  chown $1.$2 $4
+  chown $1:$2 $4
+  chmod $3 $4
+  ch_con $4
+  ch_con_ext $4 $5
+}
+
+cp_perm() {
+  rm $5
+  if [ -f "$4" ]; then
+    cat $4 > $5
+    set_perm $1 $2 $3 $5 $6
+  fi
+}
+
+ui_print "***************************************"
+ui_print "* exFAT & NTFS fuse drivers installer *"
+ui_print "***************************************"
+
+ui_print "- Mounting /system..."
+mount /system
+mount -o rw,remount /system
+mount -o rw,remount /system /system
+
+cat /system/bin/toolbox > /system/toolbox
+chmod 0755 /system/toolbox
+ch_con /system/toolbox
+
+ARCH=$(cat /system/build.prop /default.prop | grep -m 1 "ro.product.cpu.abi=" | dd bs=1 skip=19)
+
+ui_print "- Install for [$ARCH] [$ZIP]"
+
+ui_print "- Check for SuperSU installed..."
+
+if [ ! -e /system/etc/install-recovery.sh ]; then
+	ui_print "! Error: /system/etc/install-recovery.sh not found, but required!"
+	rm /system/toolbox
+	umount /system
+	exit 1
+fi
+
+if [ "$(cat /system/etc/install-recovery.sh | grep -m 1 /system/etc/install-recovery-2.sh)" = ""  ]; then
+	ui_print "! Error: /system/etc/install-recovery.sh is not controlled by SuperSU!"
+	rm /system/toolbox
+	umount /system
+	exit 2
+fi
+
+ui_print "- Extracting files..."
+
+APPDIR=androidfs
+
+cd /tmp
+mkdir $APPDIR
+cd    $APPDIR
+
+unzip -o "$ZIP"
+if [ $? != 0 ]; then
+	ui_print "! Error: unzip failed!"
+	rm /system/toolbox
+	umount /system
+	exit 3
+fi
+
+BIN=/tmp/$APPDIR/$ARCH
+COM=/tmp/$APPDIR/common
+
+if [ -f $BIN/probe ]; then
+	ui_print "- Removing old files..."
+
+	rm -f /system/etc/install-recovery-2.sh
+
+	rm -f /system/xbin/mount.exfat
+	rm -f /system/xbin/ntfs-3g
+	rm -f /system/xbin/ntfsfix
+	rm -f /system/xbin/probe
+
+	rm -f /system/xbin/mkfs.exfat
+	rm -f /system/xbin/fsck.exfat
+	rm -f /system/xbin/dumpexfat
+	rm -f /system/xbin/exfatfsck
+	rm -f /system/xbin/exfatlabel
+	rm -f /system/xbin/mkexfatfs
+	rm -f /system/xbin/mount.exfat-fuse
+
+	ui_print "- Placing files..."
+
+	cp_perm 0 0 0755 $BIN/mount.exfat /system/xbin/mount.exfat
+	ln_con /system/xbin/mount.exfat /system/xbin/mkfs.exfat
+	ln_con /system/xbin/mount.exfat /system/xbin/fsck.exfat
+	ln_con /system/xbin/mount.exfat /system/xbin/dumpexfat
+	ln_con /system/xbin/mount.exfat /system/xbin/exfatfsck
+	ln_con /system/xbin/mount.exfat /system/xbin/exfatlabel
+	ln_con /system/xbin/mount.exfat /system/xbin/mkexfatfs
+	ln_con /system/xbin/mount.exfat /system/xbin/mount.exfat-fuse
+
+	cp_perm 0 0 0755 $BIN/ntfs-3g     /system/xbin/ntfs-3g
+	cp_perm 0 0 0755 $BIN/ntfsfix     /system/xbin/ntfsfix
+
+	cp_perm 0 0 0755 $BIN/probe       /system/xbin/probe
+
+	cp_perm 0 0 0755 $COM/install-recovery-2.sh /system/etc/install-recovery-2.sh
+else
+	ui_print "! Error: Have no binaries for $ARCH platform!"
+	rm /system/toolbox
+	umount /system
+	exit 4
+fi
+
+ui_print "- Post-installation script..."
+rm /system/toolbox
+
+ui_print "- Unmounting /system..."
+umount /system
+
+ui_print "- Done!"
+exit 0
