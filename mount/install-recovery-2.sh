@@ -85,7 +85,9 @@ if [ -e /sys/fs/selinux/enforce ]; then
 		/system/xbin/supolicy --live "allow sdcardd unlabeled dir { append create execute write relabelfrom link unlink ioctl getattr setattr read rename lock mounton quotaon swapon rmdir audit_access remove_name add_name reparent execmod search open }"
 		/system/xbin/supolicy --live "allow sdcardd unlabeled file { append create write relabelfrom link unlink ioctl getattr setattr read rename lock mounton quotaon swapon audit_access open }"
 		/system/xbin/supolicy --live "allow unlabeled unlabeled filesystem associate"
-		/system/xbin/supolicy --live "allow vold unlabeled filesystem { mount remount unmount }"
+		/system/xbin/supolicy --live "allow sdcardd unlabeled filesystem { getattr mount remount unmount }"
+		/system/xbin/supolicy --live "allow vold unlabeled filesystem { getattr mount remount unmount }"
+		/system/xbin/supolicy --live "allow init unlabeled filesystem { getattr mount remount unmount }"
 	else
 # ***** Turn SELinux to Permissive. Instead, our mounts would be RO for others.
 		echo "Using setenforce 0 to provide permissions to fuse." >> $logfile
