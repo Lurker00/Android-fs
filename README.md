@@ -8,19 +8,6 @@ I spent (hope - not wasted!) some time to commit it step by step, starting from 
 
 I provide a CWM/TWRP installable zip package, with binaries for `armeabi`, `armeabi-v7a`, `arm64-v8a`, `x86`, `x86_64` and a mounting script, in the [Releases](https://github.com/Lurker00/Android-fs/releases). **Root and SuperSU are required for the mounting script to work correctly!** For more information, please read ["How to mount?"](#how-to-mount) chapter below.
 
-##History
-
-###1.0.2
-1. One more `supolicy` rule added to the mounting script. Without it, unmount from Android Settings didn't work.
-
-###1.0.1
-1. Mount script uses `supolicy`, if available, for SELinux permissions, with fallback to `setenforce 0`, if `supolicy` is not found.
-2. Moved the mounting script into `common` folder of the release package.
-3. Removed `mkntfs` from the package.
-
-###1.0.0
-First public release.
-
 ##How to mount?
 The primary goal is auto-mount of the microSD card on Android boot, with full functionality. Unmount can be done from the Android Settings. Re-mount after the boot is possible, but currently is a bit tricky (see below).
 
