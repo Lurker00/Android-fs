@@ -3,10 +3,10 @@
 **DISCLAIMER:** The source code was taken from open source projects, and only altered for Android compatibility. Expect the same bugs and misbehavior found in the original versions! **No warranty and no support at all: use it at your own risk and responsibility!**
 
 The primary goal of this project was to build the drivers for Lenovo Yoga Tablet 2 8'' 830L (firmware upgraded to 830LC) tablet, which utilizes Intel Atom (x86) CPU and runs Android 4.4.2. There are some ARM builds of these drivers over there, but I found nothing for x86. Also, I failed to find a ready-to-build project with up-to-date source code.
- 
+
 I spent (hope - not wasted!) some time to commit it step by step, starting from original sources, with all further add-ons and modifications commented, for easy repeat for more recent sources, or to merge in an update.
 
-I provide binaries for `armeabi`, `armeabi-v7a` and `x86`, along with a mounting script, in the [Releases](https://github.com/Lurker00/Android-fs/releases). **Root and SuperSU are required from the mounting script to work correctly!** Also, I provide a CWM/TWRP installable zip package, with binaries for `armeabi`, `armeabi-v7a`, `arm64-v8a`, `x86`, `x86_64`.
+I provide a CWM/TWRP installable zip package, with binaries for `armeabi`, `armeabi-v7a`, `arm64-v8a`, `x86`, `x86_64` and a mounting script, in the [Releases](https://github.com/Lurker00/Android-fs/releases). **Root and SuperSU are required for the mounting script to work correctly!** For more information, please read ["How to mount?"](#how-to-mount) chapter below.
 
 ##History
 
