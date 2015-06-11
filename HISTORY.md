@@ -1,3 +1,9 @@
+###1.0.3
+1. exFAT driver was improved to keep the file system consistent. Slight performance drop can be noticed, but a chance of file system corruption on reboots or power loss has been minimized.
+2. Mounting script checks if the device is already mounted, or mount point is already in use, before an attempt to mount.
+
+For No.1, you can read a discussion with Andrew Nayenko (the exFAT author) [here](https://groups.google.com/forum/#!topic/exfat/u5Ldpmy3vkA).
+
 ###1.0.2
 1. One more `supolicy` rule added to the mounting script. Without it, unmount from Android Settings didn't work.
 
