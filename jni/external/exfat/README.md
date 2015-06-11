@@ -18,4 +18,4 @@ This project produces only one binary file: `mount.exfat`. To have the full set 
 
 My auto-mount script creates all the links, if required.
 
-**Note regarding the file system consistency:** Starting from 1.0.3, this is the default behaviour for my Android builds. But the project can be compiled so that it works this reliable (but slightly slower) way only if the device is mounted with `sync` option. This `sync` option _does not_ sync every write with the underlying device, it only flushes file system changes earlier and more often, that the original version (or if mounted without `sync` option).
+**Note regarding the file system consistency:** Starting from [1.0.3](https://github.com/Lurker00/Android-fs/releases), this is the default behaviour for my Android builds. But the project can be compiled so that it works this reliable (but slightly slower) way only if the device is mounted with `sync` option. This `sync` option _does not_ sync every write with the underlying device, it only flushes file system changes earlier and more often, that the original version (or if mounted without `sync` option).
