@@ -1,7 +1,7 @@
 #!/system/bin/sh
 
-logfile=/data/local/tmp/exfat_mount.log
-#logfile=/dev/null
+#logfile=/data/local/tmp/exfat_mount.log
+logfile=/dev/null
 
 echo '******' $(date) '******' >> $logfile
 echo 'id: ' $(id) >> $logfile 2>&1
@@ -11,6 +11,23 @@ if [ x$SECONDARY_STORAGE == x ]; then
 	exit 1
 fi
 
+device=/dev/block/mmcblk1p1
+echo "Starting for $device" >> $logfile
+
+while read line; do
+	words=($line)
+	if [ ${words[0]} == $device ]; then
+		echo "Error: $device already mounted:" >> $logfile
+		echo "$line"                           >> $logfile
+		exit 1
+	fi
+	if [ ${words[1]} == $SECONDARY_STORAGE ]; then
+		echo "Error: SECONDARY_STORAGE already in use:" >> $logfile
+		echo "$line"                                    >> $logfile
+		exit 1
+	fi
+done < /proc/mounts
+
 binpath=/system/xbin
 
 probe=$binpath/probe
@@ -18,9 +35,6 @@ if [ ! -e $probe ]; then
 	echo "Error: $probe not found!" >> $logfile
 	exit 1
 fi
-
-device=/dev/block/mmcblk1p1
-echo "Starting for $device" >> $logfile
 
 FS=($($probe $device))
 echo "$device file system:" ${FS[0]} >> $logfile
@@ -45,15 +59,11 @@ if [ ${FS[0]} == "exFAT" ]; then
 	fsck=$binpath/exfatfsck
 	fsck_ops=
 
-	options_ro="ro,uid=1023,gid=1023,umask=0000"
-	options_rw="rw,uid=1023,gid=1023,umask=0000,noatime,sync"
 elif [ ${FS[0]} == "NTFS" ]; then
 	echo "$device is NTFS" >> $logfile
 	mount=$binpath/ntfs-3g
 	fsck=$binpath/ntfsfix
 	fsck_ops='-n'
-	options_ro="ro,uid=1023,gid=1023,umask=0000"
-	options_rw="rw,uid=1023,gid=1023,umask=0000,noatime"
 else
 	echo "Error: $device is not supported!" >> $logfile
 	exit 1
@@ -70,6 +80,8 @@ if [ ! -e $fsck ]; then
 fi
 
 # ***** Mount for rw only if the file system is not damaged.
+options_ro="ro,uid=1023,gid=1023,umask=0000"
+options_rw="rw,uid=1023,gid=1023,umask=0000,noatime,sync"
 mnt_cmd="$mount -o $options_rw $device /mnt/media_rw/sdcard1"
 
 $fsck $fsck_ops $device >> $logfile 2>&1
@@ -95,10 +107,6 @@ if [ -e /sys/fs/selinux/enforce ]; then
 	fi
 fi
 
-# ***** Just in case, and it would work only on boot.
-chown media_rw:media_rw $SECONDARY_STORAGE > /dev/null 2>&1
-chmod 777 $SECONDARY_STORAGE               > /dev/null 2>&1
-
 # ***** Try to mount:
 if [ 0 != 0 ]; then
 	$mount -o $options_rw $device $SECONDARY_STORAGE
@@ -108,7 +116,7 @@ else
 	 	mount -o remount,rw /system
 		rm -f                              /system/bin/debuggerd.mine
 		echo '#!/system/bin/sh'          > /system/bin/debuggerd.mine
-		echo "$mnt_cmd"                  >> /system/bin/debuggerd.mine
+		echo "$mnt_cmd"                 >> /system/bin/debuggerd.mine
 		echo 'start fuse_sdcard1'       >> /system/bin/debuggerd.mine
 		chmod 777                          /system/bin/debuggerd.mine
 		stop  debuggerd
