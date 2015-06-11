@@ -404,14 +404,19 @@ ssize_t exfat_generic_pwrite(struct exfat* ef, struct exfat_node* node,
 	const char* bufp = buffer;
 	off64_t lsize, loffset, remainder;
 
- 	if (offset > node->size)
- 		if (exfat_truncate(ef, node, offset, true) != 0)
- 			return -1;
-  	if (offset + size > node->size)
- 		if (exfat_truncate(ef, node, offset + size, false) != 0)
- 			return -1;
+	if (offset > node->size)
+		if (exfat_truncate(ef, node, offset, true) != 0)
+			return -1;
+	if (offset + size > node->size)
+		if (exfat_truncate(ef, node, offset + size, false) != 0)
+			return -1;
 	if (size == 0)
 		return 0;
+
+#if !defined(ALWAYS_FLUSH_CMAP) || !ALWAYS_FLUSH_CMAP
+	if ( ef->sync )
+#endif
+		exfat_flush_cmap(ef);
 
 	cluster = exfat_advance_cluster(ef, node, offset / CLUSTER_SIZE(*ef->sb));
 	if (CLUSTER_INVALID(cluster))
