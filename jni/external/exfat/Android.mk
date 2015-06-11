@@ -7,6 +7,7 @@ EXFAT_CFLAGS := -Wall -O2 -std=c99 \
                 -D__GLIBC__ \
                 -D_FILE_OFFSET_BITS=64 \
                 -DALWAYS_FLUSH_CMAP=1 \
+                -DUSE_TRANSITIONAL_LFS=1 \
                 -I$(EXFAT_ROOT)/libexfat \
                 -I$(EXFAT_ROOT)/../fuse/include
 
