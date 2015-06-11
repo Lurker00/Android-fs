@@ -80,6 +80,10 @@ int exfat_cleanup_node(struct exfat* ef, struct exfat_node* node)
 		rc = exfat_truncate(ef, node, 0, true);
 		/* free the node even in case of error or its memory will be lost */
 		free(node);
+#if !defined(ALWAYS_FLUSH_CMAP) || !ALWAYS_FLUSH_CMAP
+		if ( ef->sync )
+#endif
+			exfat_flush_cmap(ef);
 	}
 	return rc;
 }
@@ -655,9 +659,6 @@ int exfat_flush_node(struct exfat* ef, struct exfat_node* node)
 
 	node->flags &= ~EXFAT_ATTRIB_DIRTY;
 
-	//** kis: Android not always unmounts an SD card when it reboots,
-	// leaving FS in a damaged state! Flushing cmap here ensures that
-	// all files written are in correct state.
 #if !defined(ALWAYS_FLUSH_CMAP) || !ALWAYS_FLUSH_CMAP
 	if ( ef->sync )
 #endif
