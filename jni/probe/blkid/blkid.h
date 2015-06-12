@@ -14,6 +14,18 @@
 #define _BLKID_BLKID_H
 
 #include <sys/types.h>
+#if defined(__ANDROID__)
+#	include <linux/types.h>
+#	if !defined(_LINUX_TYPES_H)
+#		define _LINUX_TYPES_H   1
+#	endif
+#	if !defined(_BLKID_TYPES_H)
+#		define _BLKID_TYPES_H   1
+#	endif
+#	if !defined(_EXT2_TYPES_H)
+#		define _EXT2_TYPES_H    1
+#	endif
+#endif
 #include <blkid/blkid_types.h>
 
 #ifdef __cplusplus
