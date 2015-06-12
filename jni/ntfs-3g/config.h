@@ -197,6 +197,7 @@
 
 /* Define to 1 if `st_atimensec' is member of `struct stat'. */
 /* #undef HAVE_STRUCT_STAT_ST_ATIMENSEC */
+#define HAVE_STRUCT_STAT_ST_ATIMENSEC	1
 
 /* Define to 1 if `st_atimespec' is member of `struct stat'. */
 /* #undef HAVE_STRUCT_STAT_ST_ATIMESPEC */
