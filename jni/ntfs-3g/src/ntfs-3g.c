@@ -3449,16 +3449,20 @@ static int ntfs_fuse_init(void)
 	ctx = ntfs_calloc(sizeof(ntfs_fuse_context_t));
 	if (!ctx)
 		return -1;
-	
+
 	*ctx = (ntfs_fuse_context_t) {
 		.uid     = getuid(),
 		.gid     = getgid(),
-#if defined(linux)			
+#if defined(linux)
 		.streams = NF_STREAMS_INTERFACE_XATTR,
-#else			
+#else
 		.streams = NF_STREAMS_INTERFACE_NONE,
-#endif			
+#endif
+#if defined(__ANDROID__)
+		.atime   = ATIME_DISABLED,
+#else
 		.atime   = ATIME_RELATIVE,
+#endif
 		.silent  = TRUE,
 		.recover = TRUE
 	};
@@ -3800,6 +3804,9 @@ int main(int argc, char *argv[])
 		err = NTFS_VOLUME_SYNTAX_ERROR;
 		goto err_out;
 	}
+#if defined(__ANDROID__)
+	ctx->atime = ATIME_DISABLED;
+#endif
 	if (!ntfs_check_if_mounted(opts.device,&existing_mount)
 	    && (existing_mount & NTFS_MF_MOUNTED)
 		/* accept multiple read-only mounts */

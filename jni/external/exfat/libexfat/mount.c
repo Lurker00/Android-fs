@@ -93,7 +93,11 @@ static void parse_options(struct exfat* ef, const char* options)
 	ef->uid = get_int_option(options, "uid", 10, geteuid());
 	ef->gid = get_int_option(options, "gid", 10, getegid());
 
+#if defined(__ANDROID__)
+	ef->noatime = true;
+#else
 	ef->noatime = match_option(options, "noatime");
+#endif
 	ef->sync    = match_option(options, "sync");
 }
 
