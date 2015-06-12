@@ -833,7 +833,7 @@ static int probe_ntfs(struct blkid_probe *probe,
 		}
 	}
 
-	sprintf(uuid_str, "%016llX", blkid_le64(ns->volume_serial));
+	sprintf(uuid_str, "%016llX", (long long)blkid_le64(ns->volume_serial));
 	blkid_set_tag(probe->dev, "UUID", uuid_str, 0);
 	if (label_str[0])
 		blkid_set_tag(probe->dev, "LABEL", label_str, 0);
@@ -1226,7 +1226,7 @@ static int probe_hfs(struct blkid_probe *probe __BLKID_ATTR((unused)),
 
 	uuid = blkid_le64(*((unsigned long long *) hfs->finder_info.id));
 	if (uuid) {
-		sprintf(uuid_str, "%016llX", uuid);
+		sprintf(uuid_str, "%016llX", (long long)uuid);
 		blkid_set_tag(probe->dev, "UUID", uuid_str, 0);
 	}
 	blkid_set_tag(probe->dev, "LABEL", hfs->label, hfs->label_len);
@@ -1290,7 +1290,7 @@ static int probe_hfsplus(struct blkid_probe *probe,
 
 	uuid = blkid_le64(*((unsigned long long *) hfsplus->finder_info.id));
 	if (uuid) {
-		sprintf(uuid_str, "%016llX", uuid);
+		sprintf(uuid_str, "%016llX", (long long)uuid);
 		blkid_set_tag(probe->dev, "UUID", uuid_str, 0);
 	}
 

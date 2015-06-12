@@ -144,7 +144,7 @@ void output_dm_deps()
 
 		//iterate over device dependencies
 		for(i=0;i<deps->count;i++){
-			__android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,"output_dm_deps(): \tdev=0x%llx %u:%u",deps->dev[i],major(deps->dev[i]),minor(deps->dev[i]));
+			__android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,"output_dm_deps(): \tdev=0x%llx %u:%u",(long long)deps->dev[i],major(deps->dev[i]),minor(deps->dev[i]));
 			if(printf("%u:%u/%s\n",major(deps->dev[i]),minor(deps->dev[i]),list->name)<0)
 				break;
 		}
