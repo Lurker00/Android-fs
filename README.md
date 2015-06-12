@@ -21,7 +21,7 @@ I hope other commands it uses are available in the shell of your device.
 
 The script creates the links for exFAT tools, if required. It checks the file system before mounting, and mounts it read-only if it has found errors. It does not fix the errors found: please use Windows or your OS tools to correct the file system errors.
 
-**NOTE:** If there is no `/system/xbin/supolicy` (provided by SuperUS), the script sets SELinux to Permissive mode! Instead, the mount would be read-only. If you know how to overcome it, please let me know.
+**NOTE:** If there is no `/system/xbin/supolicy` (provided by SuperSU), the script sets SELinux to Permissive mode! Instead, the mount would be read-only. If you know how to overcome it, please let me know.
 
 The `/system/etc/install-recovery-2.sh` script can be executed manually, from a terminal, e.g. to re-mount without system restart. For this particular purpose, please run it with any parameter, e.g.
 
