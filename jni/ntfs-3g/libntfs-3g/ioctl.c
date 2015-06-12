@@ -372,7 +372,7 @@ int ntfs_ioctl(ntfs_inode *ni __attribute__((unused)), int cmd, void *arg __attr
 		else
 			ret = fstrim(ni->vol, data);
 		break;
-#else
+#elif !defined(__ANDROID__)
 #warning FITRIM or BLKDISCARD not defined
 #endif
 	default :
