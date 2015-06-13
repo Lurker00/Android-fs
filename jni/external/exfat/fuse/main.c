@@ -463,6 +463,7 @@ int mount_exfat_main(int argc, char* argv[])
 
 	printf("FUSE exfat %u.%u.%u\n",
 			EXFAT_VERSION_MAJOR, EXFAT_VERSION_MINOR, EXFAT_VERSION_PATCH);
+	fflush(stdout);
 
 	mount_options = strdup(default_options);
 	if (mount_options == NULL)
