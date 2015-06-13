@@ -131,7 +131,7 @@ static void fsck(struct exfat* ef)
 
 static void usage(const char* prog)
 {
-	fprintf(stderr, "Usage: %s [-V] <device>\n", prog);
+	fprintf(stderr, "Usage: %s [-Vn] <device>\n", prog);
 	exit(1);
 }
 
@@ -140,6 +140,7 @@ int exfatfsck_main(int argc, char* argv[])
 	int opt;
 	const char* spec = NULL;
 	struct exfat ef;
+	bool no_fix = false;
 
 	printf("exfatfsck %u.%u.%u\n",
 			EXFAT_VERSION_MAJOR, EXFAT_VERSION_MINOR, EXFAT_VERSION_PATCH);
@@ -151,6 +152,9 @@ int exfatfsck_main(int argc, char* argv[])
 		case 'V':
 			puts("Copyright (C) 2011-2014  Andrew Nayenko");
 			return 0;
+		case 'n':
+			no_fix = true;
+			break;
 		default:
 			usage(argv[0]);
 			break;
@@ -165,16 +169,31 @@ int exfatfsck_main(int argc, char* argv[])
 
 	printf("Checking file system on %s.\n", spec);
 	fsck(&ef);
-	exfat_unmount(&ef);
 	printf("Totally %"PRIu64" directories and %"PRIu64" files.\n",
 			directories_count, files_count);
 
-	fputs("File system checking finished. ", stdout);
-	if (exfat_errors != 0)
+	puts("File system checking finished.");
+
+	if ( !no_fix && exfat_errors == 0 && (le16_to_cpu(ef.sb->volume_state) & EXFAT_STATE_MOUNTED) != 0 )
+	{
+		puts("Closing the volume...");
+		exfat_unmount(&ef);
+		if ( exfat_mount(&ef, spec, "rw") != 0 )
+		{
+			puts("Failed to mount for writing!");
+			puts("No errors found.");
+			return 0;
+		}
+		puts("Done!");
+	}
+
+	exfat_unmount(&ef);
+	if ( exfat_errors != 0 )
 	{
 		printf("ERRORS FOUND: %d.\n", exfat_errors);
 		return 1;
 	}
+
 	puts("No errors found.");
 	return 0;
 }
