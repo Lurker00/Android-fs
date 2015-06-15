@@ -61,7 +61,9 @@ const int nf_ns_security_prefix_len = sizeof(nf_ns_security_prefix) - 1;
 const char nf_ns_trusted_prefix[] = "trusted.";
 const int nf_ns_trusted_prefix_len = sizeof(nf_ns_trusted_prefix) - 1;
 
+#if defined(HAVE_SETXATTR) && !defined(XATTR_MAPPINGS)
 static const char nf_ns_alt_xattr_efsinfo[] = "user.ntfs.efsinfo";
+#endif
 
 static const char def_opts[] = "allow_other,nonempty,";
 
