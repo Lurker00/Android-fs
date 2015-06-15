@@ -20,6 +20,10 @@
 #include <errno.h>
 #include <sys/time.h>
 #include <pthread.h>
+#if defined(__ANDROID__)
+extern int pthread_cancel(pthread_t thread);
+extern int pthread_setcancelstate(int state, int *oldstate);
+#endif
 
 /* Environment var controlling the thread stack size */
 #define ENVNAME_THREAD_STACK "FUSE_THREAD_STACK"

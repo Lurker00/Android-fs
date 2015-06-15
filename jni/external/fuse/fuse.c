@@ -37,6 +37,10 @@
 #include <sys/uio.h>
 #include <sys/time.h>
 #include <sys/mman.h>
+#if defined(__ANDROID__)
+extern int pthread_cancel(pthread_t thread);
+extern int pthread_setcancelstate(int state, int *oldstate);
+#endif
 
 #define FUSE_NODE_SLAB 1
 
