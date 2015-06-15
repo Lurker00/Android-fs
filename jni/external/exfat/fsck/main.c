@@ -145,7 +145,7 @@ int exfatfsck_main(int argc, char* argv[])
 	printf("exfatfsck %u.%u.%u\n",
 			EXFAT_VERSION_MAJOR, EXFAT_VERSION_MINOR, EXFAT_VERSION_PATCH);
 
-	while ((opt = getopt(argc, argv, "V")) != -1)
+	while ((opt = getopt(argc, argv, "Vn")) != -1)
 	{
 		switch (opt)
 		{
