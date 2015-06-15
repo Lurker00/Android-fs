@@ -13,6 +13,7 @@
 #define _XOPEN_SOURCE 600 /* for inclusion of strtoull */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
 #include <time.h>

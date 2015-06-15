@@ -11,6 +11,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "blkid/blkid.h"
+#include "blkid/blkidP.h"
 
 void*devmapper_ioctl(struct dm_ioctl**io,uint32_t*size,int fd,const char*name,int request);
 

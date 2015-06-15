@@ -248,7 +248,7 @@ static int linux_version_code()
 {
 #ifdef __linux__
 	struct utsname	ut;
-	static		version_code = -1;
+	static int version_code = -1;
 	int		major, minor, rev;
 	char		*endptr;
 	const char 	*cp;
@@ -1229,7 +1229,7 @@ static int probe_hfs(struct blkid_probe *probe __BLKID_ATTR((unused)),
 		sprintf(uuid_str, "%016llX", (long long)uuid);
 		blkid_set_tag(probe->dev, "UUID", uuid_str, 0);
 	}
-	blkid_set_tag(probe->dev, "LABEL", hfs->label, hfs->label_len);
+	blkid_set_tag(probe->dev, "LABEL", (const char *)hfs->label, hfs->label_len);
 	return 0;
 }
 
@@ -1260,7 +1260,7 @@ static int probe_hfsplus(struct blkid_probe *probe,
 	unsigned int label_len;
 	int ext;
 	__u64 leaf_off, uuid;
-	char	uuid_str[17], label[512];
+	char uuid_str[17], label[512];
 
 	/* Check for a HFS+ volume embedded in a HFS volume */
 	if (memcmp(sbd->signature, "BD", 2) == 0) {
@@ -1350,7 +1350,7 @@ static int probe_hfsplus(struct blkid_probe *probe,
 		return 0;
 
 	label_len = blkid_be16(key->unicode_len) * 2;
-	unicode_16be_to_utf8(label, sizeof(label), key->unicode, label_len);
+	unicode_16be_to_utf8((unsigned char *)label, sizeof(label), key->unicode, label_len);
 	blkid_set_tag(probe->dev, "LABEL", label, 0);
 	return 0;
 }
