@@ -168,14 +168,15 @@ bool exfat_flush_cmap(struct exfat* ef)
 				exfat_c2o(ef, ef->cmap.start_cluster)) < 0)
 		{
 			exfat_error("failed to write clusters bitmap");
+			ef->was_dirty = true; // Leaves the volume "mounted", to force chkdsk on it.
 			return false;
 		}
 		ef->cmap.dirty = false;
 	}
-	return true;
+	return exfat_dirty(ef, false) == 0;
 }
 
-static bool set_next_cluster(const struct exfat* ef, bool contiguous,
+static bool set_next_cluster(struct exfat* ef, bool contiguous,
 		cluster_t current, cluster_t next)
 {
 	off64_t fat_offset;
@@ -190,6 +191,7 @@ static bool set_next_cluster(const struct exfat* ef, bool contiguous,
 	{
 		exfat_error("failed to write the next cluster %#x after %#x", next,
 				current);
+		ef->was_dirty = true; // Leaves the volume "mounted", to force chkdsk on it.
 		return false;
 	}
 	return true;
@@ -228,7 +230,7 @@ static void free_cluster(struct exfat* ef, cluster_t cluster)
 	ef->cmap.dirty = true;
 }
 
-static bool make_noncontiguous(const struct exfat* ef, cluster_t first,
+static bool make_noncontiguous(struct exfat* ef, cluster_t first,
 		cluster_t last)
 {
 	cluster_t c;

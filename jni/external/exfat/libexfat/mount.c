@@ -138,27 +138,127 @@ static bool verify_vbr_checksum(struct exfat_dev* dev, void* sector,
 	return true;
 }
 
-static int commit_super_block(const struct exfat* ef)
+static int commit_super_block(struct exfat* ef)
 {
 	if (exfat_pwrite(ef->dev, ef->sb, sizeof(struct exfat_super_block), 0) < 0)
 	{
 		exfat_error("failed to write super block");
+		ef->was_dirty = true; // Leaves the volume "mounted", to force chkdsk on it.
 		return 1;
 	}
 	return exfat_fsync(ef->dev);
 }
 
-static int prepare_super_block(const struct exfat* ef)
+static int prepare_super_block(struct exfat* ef)
 {
 	if (le16_to_cpu(ef->sb->volume_state) & EXFAT_STATE_MOUNTED)
+	{
 		exfat_warn("volume was not unmounted cleanly");
+		// This will prevent from clearing of EXFAT_STATE_MOUNTED on unmount:
+		ef->was_dirty = true;
+	}
 
 	if (ef->ro)
 		return 0;
 
-	ef->sb->volume_state = cpu_to_le16(
-			le16_to_cpu(ef->sb->volume_state) | EXFAT_STATE_MOUNTED);
-	return commit_super_block(ef);
+#if !defined(ALWAYS_FLUSH_CMAP) || !ALWAYS_FLUSH_CMAP
+	if ( !ef->sync )
+	{
+		ef->sb->volume_state = cpu_to_le16(
+				le16_to_cpu(ef->sb->volume_state) | EXFAT_STATE_MOUNTED);
+		return commit_super_block(ef);
+	}
+#endif
+	return 0;
+}
+
+static int finalize_super_block(struct exfat* ef)
+{
+	bool changed = false;
+	if (ef->ro)
+		return 0;
+
+	if ( !ef->was_dirty && (le16_to_cpu(ef->sb->volume_state) & EXFAT_STATE_MOUNTED) != 0 )
+	{
+		ef->sb->volume_state = cpu_to_le16(
+				le16_to_cpu(ef->sb->volume_state) & ~EXFAT_STATE_MOUNTED);
+		changed = true;
+	}
+
+	/* Some implementations set the percentage of allocated space to 0xff
+	   on FS creation and never update it. In this case leave it as is. */
+	if (ef->sb->allocated_percent != 0xff)
+	{
+		uint32_t free, total;
+		uint8_t percent;
+
+		free    = exfat_count_free_clusters(ef);
+		total   = le32_to_cpu(ef->sb->cluster_count);
+		percent = ((total - free) * 100 + total / 2) / total;
+
+		if ( ef->sb->allocated_percent != percent )
+		{
+			ef->sb->allocated_percent = percent;
+			changed = true;
+		}
+	}
+
+	if ( changed )
+		return commit_super_block(ef);
+	else
+		return 0;
+}
+
+static void count_dirty_nodes(struct exfat* ef, struct exfat_node* node, uint32_t *count)
+{
+	struct exfat_node* p;
+
+	for (p = node->child; p != NULL; p = p->next)
+		count_dirty_nodes(ef, p, count);
+	if ( count != NULL && (node->flags & EXFAT_ATTRIB_DIRTY) != 0 )
+		(*count)++;
+}
+
+int exfat_dirty(struct exfat* ef, bool dirty)
+{
+	if (ef->ro)
+		return 0;
+#if !defined(ALWAYS_FLUSH_CMAP) || !ALWAYS_FLUSH_CMAP
+	if ( !ef->sync )
+		return 0;
+#endif
+
+	// was_dirty can be set by write errors. Allow to mark the volume "mounted"
+	// for such situations.
+	if ( ef->was_dirty && !dirty )
+		return 0;
+
+	if ( dirty )
+	{
+		if ( (le16_to_cpu(ef->sb->volume_state) & EXFAT_STATE_MOUNTED) == 0 )
+		{
+			ef->sb->volume_state = cpu_to_le16(
+					le16_to_cpu(ef->sb->volume_state) | EXFAT_STATE_MOUNTED);
+			return commit_super_block(ef);
+		}
+		else
+			return 0;
+	}
+	else if ( (le16_to_cpu(ef->sb->volume_state) & EXFAT_STATE_MOUNTED) != 0 )
+	{
+		if (ef->cmap.dirty)
+			return 0;
+
+		// Root directory can be marked as dirty, but it has no metadata to flush!
+		uint32_t count = -((ef->root->flags & EXFAT_ATTRIB_DIRTY) != 0);
+		count_dirty_nodes(ef, ef->root, &count);
+		if ( count > 0 )
+			return 0;
+
+		return finalize_super_block(ef);
+	}
+	else
+		return 0;
 }
 
 int exfat_mount(struct exfat* ef, const char* spec, const char* options)
@@ -324,28 +424,6 @@ error:
 	exfat_close(ef->dev);
 	free(ef->sb);
 	return -EIO;
-}
-
-static void finalize_super_block(struct exfat* ef)
-{
-	if (ef->ro)
-		return;
-
-	ef->sb->volume_state = cpu_to_le16(
-			le16_to_cpu(ef->sb->volume_state) & ~EXFAT_STATE_MOUNTED);
-
-	/* Some implementations set the percentage of allocated space to 0xff
-	   on FS creation and never update it. In this case leave it as is. */
-	if (ef->sb->allocated_percent != 0xff)
-	{
-		uint32_t free, total;
-
-		free = exfat_count_free_clusters(ef);
-		total = le32_to_cpu(ef->sb->cluster_count);
-		ef->sb->allocated_percent = ((total - free) * 100 + total / 2) / total;
-	}
-
-	commit_super_block(ef);	/* ignore return code */
 }
 
 void exfat_unmount(struct exfat* ef)

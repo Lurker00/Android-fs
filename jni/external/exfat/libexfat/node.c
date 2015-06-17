@@ -603,7 +603,13 @@ int exfat_flush_node(struct exfat* ef, struct exfat_node* node)
 	struct exfat_entry_meta2 meta2;
 
 	if (!(node->flags & EXFAT_ATTRIB_DIRTY))
+	{
+#if !defined(ALWAYS_FLUSH_CMAP) || !ALWAYS_FLUSH_CMAP
+		if ( ef->sync )
+#endif
+			exfat_flush_cmap(ef);
 		return 0; /* no need to flush */
+	}
 
 	if (ef->ro)
 		exfat_bug("unable to flush node to read-only FS");
@@ -649,11 +655,13 @@ int exfat_flush_node(struct exfat* ef, struct exfat_node* node)
 	if (exfat_pwrite(ef->dev, &meta1, sizeof(meta1), meta1_offset) < 0)
 	{
 		exfat_error("failed to write meta1 entry on flush");
+		ef->was_dirty = true; // Leaves the volume "mounted", to force chkdsk on it.
 		return -EIO;
 	}
 	if (exfat_pwrite(ef->dev, &meta2, sizeof(meta2), meta2_offset) < 0)
 	{
 		exfat_error("failed to write meta2 entry on flush");
+		ef->was_dirty = true; // Leaves the volume "mounted", to force chkdsk on it.
 		return -EIO;
 	}
 
@@ -678,6 +686,7 @@ static bool erase_entry(struct exfat* ef, struct exfat_node* node)
 	if (exfat_pwrite(ef->dev, &entry_type, 1, co2o(ef, cluster, offset)) < 0)
 	{
 		exfat_error("failed to erase meta1 entry");
+		ef->was_dirty = true; // Leaves the volume "mounted", to force chkdsk on it.
 		return false;
 	}
 
@@ -687,6 +696,7 @@ static bool erase_entry(struct exfat* ef, struct exfat_node* node)
 	if (exfat_pwrite(ef->dev, &entry_type, 1, co2o(ef, cluster, offset)) < 0)
 	{
 		exfat_error("failed to erase meta2 entry");
+		ef->was_dirty = true; // Leaves the volume "mounted", to force chkdsk on it.
 		return false;
 	}
 
@@ -699,6 +709,7 @@ static bool erase_entry(struct exfat* ef, struct exfat_node* node)
 				co2o(ef, cluster, offset)) < 0)
 		{
 			exfat_error("failed to erase name entry");
+			ef->was_dirty = true; // Leaves the volume "mounted", to force chkdsk on it.
 			return false;
 		}
 	}
@@ -892,6 +903,7 @@ static int write_entry(struct exfat* ef, struct exfat_node* dir,
 			co2o(ef, cluster, offset)) < 0)
 	{
 		exfat_error("failed to write meta1 entry");
+		ef->was_dirty = true; // Leaves the volume "mounted", to force chkdsk on it.
 		return -EIO;
 	}
 	if (!next_entry(ef, dir, &cluster, &offset))
@@ -900,6 +912,7 @@ static int write_entry(struct exfat* ef, struct exfat_node* dir,
 			co2o(ef, cluster, offset)) < 0)
 	{
 		exfat_error("failed to write meta2 entry");
+		ef->was_dirty = true; // Leaves the volume "mounted", to force chkdsk on it.
 		return -EIO;
 	}
 	for (i = 0; i < name_entries; i++)
@@ -914,6 +927,7 @@ static int write_entry(struct exfat* ef, struct exfat_node* dir,
 				co2o(ef, cluster, offset)) < 0)
 		{
 			exfat_error("failed to write name entry");
+			ef->was_dirty = true; // Leaves the volume "mounted", to force chkdsk on it.
 			return -EIO;
 		}
 	}
@@ -1039,6 +1053,7 @@ static int rename_entry(struct exfat* ef, struct exfat_node* dir,
 			co2o(ef, new_cluster, new_offset)) < 0)
 	{
 		exfat_error("failed to write meta1 entry on rename");
+		ef->was_dirty = true; // Leaves the volume "mounted", to force chkdsk on it.
 		return -EIO;
 	}
 	if (!next_entry(ef, dir, &new_cluster, &new_offset))
@@ -1047,6 +1062,7 @@ static int rename_entry(struct exfat* ef, struct exfat_node* dir,
 			co2o(ef, new_cluster, new_offset)) < 0)
 	{
 		exfat_error("failed to write meta2 entry on rename");
+		ef->was_dirty = true; // Leaves the volume "mounted", to force chkdsk on it.
 		return -EIO;
 	}
 
@@ -1061,6 +1077,7 @@ static int rename_entry(struct exfat* ef, struct exfat_node* dir,
 				co2o(ef, new_cluster, new_offset)) < 0)
 		{
 			exfat_error("failed to write name entry on rename");
+			ef->was_dirty = true; // Leaves the volume "mounted", to force chkdsk on it.
 			return -EIO;
 		}
 	}
@@ -1239,6 +1256,7 @@ int exfat_set_label(struct exfat* ef, const char* label)
 			co2o(ef, cluster, offset)) < 0)
 	{
 		exfat_error("failed to write label entry");
+		ef->was_dirty = true; // Leaves the volume "mounted", to force chkdsk on it.
 		return -EIO;
 	}
 	strcpy(ef->label, label);

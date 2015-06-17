@@ -2,7 +2,7 @@
 	exFAT file system multi-call binary
 
 	Copyright (C) 2011-2013  Andrew Nayenko
-    Copyright (C) 2013 The CyanogenMod Project
+	Copyright (C) 2013 The CyanogenMod Project
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -29,6 +29,8 @@ extern int exfatlabel_main(int argc, char* argv[]);
 
 int main(int argc, char* argv[])
 {
+	printf("exFAT multi-call binary, mod/build 1.0.4 by Lurker\n");
+	fflush(stdout);
     if (strstr(argv[0], "mkfs.exfat") != NULL || strstr(argv[0], "mkexfatfs") != NULL)
         return mkexfatfs_main(argc, argv);
     if (strstr(argv[0], "fsck.exfat") != NULL || strstr(argv[0], "exfatfsck") != NULL)

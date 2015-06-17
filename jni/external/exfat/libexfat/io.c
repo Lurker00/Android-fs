@@ -397,23 +397,12 @@ ssize_t exfat_generic_pread(const struct exfat* ef, struct exfat_node* node,
 	return MIN(size, node->size - offset) - remainder;
 }
 
-/*
- * Size in bytes to size in clusters (rounded upwards).
- */
-static uint32_t bytes2clusters(const struct exfat* ef, uint64_t bytes)
-{
-	uint64_t cluster_size = CLUSTER_SIZE(*ef->sb);
-	return (bytes + cluster_size - 1) / cluster_size;
-}
-
 ssize_t exfat_generic_pwrite(struct exfat* ef, struct exfat_node* node,
 		const void* buffer, size_t size, off64_t offset)
 {
 	cluster_t cluster;
 	const char* bufp = buffer;
 	off64_t lsize, loffset, remainder;
-
-	uint32_t c1 = bytes2clusters(ef, node->size);
 
 	if (offset > node->size)
 		if (exfat_truncate(ef, node, offset, true) != 0)
@@ -423,8 +412,6 @@ ssize_t exfat_generic_pwrite(struct exfat* ef, struct exfat_node* node,
 			return -1;
 	if (size == 0)
 		return 0;
-
-	uint32_t c2 = bytes2clusters(ef, node->size);
 
 	cluster = exfat_advance_cluster(ef, node, offset / CLUSTER_SIZE(*ef->sb));
 	if (CLUSTER_INVALID(cluster))
@@ -447,6 +434,7 @@ ssize_t exfat_generic_pwrite(struct exfat* ef, struct exfat_node* node,
 				exfat_c2o(ef, cluster) + loffset) < 0)
 		{
 			exfat_error("failed to write cluster %#x", cluster);
+			ef->was_dirty = true; // Leaves the volume "mounted", to force chkdsk on it.
 			return -1;
 		}
 		bufp += lsize;
@@ -455,13 +443,5 @@ ssize_t exfat_generic_pwrite(struct exfat* ef, struct exfat_node* node,
 		cluster = exfat_next_cluster(ef, node, cluster);
 	}
 	exfat_update_mtime(node);
-
-#if !defined(ALWAYS_FLUSH_CMAP) || !ALWAYS_FLUSH_CMAP
-	if ( ef->sync )
-#endif
-		if ( c1 != c2 )
-			if ( exfat_flush_node(ef, node) != 0 )
-				return -1;
-
 	return size - remainder;
 }

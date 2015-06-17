@@ -84,6 +84,7 @@ static int fuse_exfat_truncate(const char* path, off64_t size)
 	if (rc != 0)
 		return rc;
 
+	exfat_dirty(&ef, true);
 	rc = exfat_truncate(&ef, node, size, true);
 	if (rc != 0)
 	{
@@ -198,11 +199,20 @@ static int fuse_exfat_read(const char* path, char* buffer, size_t size,
 		off64_t offset, struct fuse_file_info* fi)
 {
 	ssize_t ret;
+	struct exfat_node* node;
 
 	exfat_debug("[%s] %s (%zu bytes)", __func__, path, size);
-	ret = exfat_generic_pread(&ef, get_node(fi), buffer, size, offset);
+	node = get_node(fi);
+	ret = exfat_generic_pread(&ef, node, buffer, size, offset);
 	if (ret < 0)
 		return -EIO;
+#if !defined(ALWAYS_FLUSH_CMAP) || !ALWAYS_FLUSH_CMAP
+	if ( ef.sync )
+#endif
+	{
+		if ( !ef.ro && (node->flags & EXFAT_ATTRIB_DIRTY) != 0 )
+			exfat_flush_node(&ef, node);
+	}
 	return ret;
 }
 
@@ -212,6 +222,7 @@ static int fuse_exfat_write(const char* path, const char* buffer, size_t size,
 	ssize_t ret;
 
 	exfat_debug("[%s] %s (%zu bytes)", __func__, path, size);
+	exfat_dirty(&ef, true);
 	ret = exfat_generic_pwrite(&ef, get_node(fi), buffer, size, offset);
 	if (ret < 0)
 		return -EIO;
@@ -229,11 +240,13 @@ static int fuse_exfat_unlink(const char* path)
 	if (rc != 0)
 		return rc;
 
+	exfat_dirty(&ef, true);
 	rc = exfat_unlink(&ef, node);
 	exfat_put_node(&ef, node);
-	if (rc != 0)
-		return rc;
-	return exfat_cleanup_node(&ef, node);
+	if (rc == 0)
+		rc = exfat_cleanup_node(&ef, node);
+	exfat_dirty(&ef, false);
+	return rc;
 }
 
 static int fuse_exfat_rmdir(const char* path)
@@ -247,29 +260,43 @@ static int fuse_exfat_rmdir(const char* path)
 	if (rc != 0)
 		return rc;
 
+	exfat_dirty(&ef, true);
 	rc = exfat_rmdir(&ef, node);
 	exfat_put_node(&ef, node);
-	if (rc != 0)
-		return rc;
-	return exfat_cleanup_node(&ef, node);
+	if (rc == 0)
+		rc = exfat_cleanup_node(&ef, node);
+	exfat_dirty(&ef, false);
+	return rc;
 }
 
 static int fuse_exfat_mknod(const char* path, mode_t mode, dev_t dev)
 {
+	int rc;
 	exfat_debug("[%s] %s 0%ho", __func__, path, mode);
-	return exfat_mknod(&ef, path);
+	exfat_dirty(&ef, true);
+	rc = exfat_mknod(&ef, path);
+	exfat_dirty(&ef, false);
+	return rc;
 }
 
 static int fuse_exfat_mkdir(const char* path, mode_t mode)
 {
+	int rc;
 	exfat_debug("[%s] %s 0%ho", __func__, path, mode);
-	return exfat_mkdir(&ef, path);
+	exfat_dirty(&ef, true);
+	rc = exfat_mkdir(&ef, path);
+	exfat_dirty(&ef, false);
+	return rc;
 }
 
 static int fuse_exfat_rename(const char* old_path, const char* new_path)
 {
+	int rc;
 	exfat_debug("[%s] %s => %s", __func__, old_path, new_path);
-	return exfat_rename(&ef, old_path, new_path);
+	exfat_dirty(&ef, true);
+	rc = exfat_rename(&ef, old_path, new_path);
+	exfat_dirty(&ef, false);
+	return rc;
 }
 
 static int fuse_exfat_utimens(const char* path, const struct timespec tv[2])

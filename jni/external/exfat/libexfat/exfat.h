@@ -113,6 +113,7 @@ struct exfat
 	int ro;
 	bool noatime;
 	bool sync;
+	bool was_dirty;
 };
 
 /* in-core nodes iterator */
@@ -210,6 +211,7 @@ void exfat_update_mtime(struct exfat_node* node);
 const char* exfat_get_label(struct exfat* ef);
 int exfat_set_label(struct exfat* ef, const char* label);
 
+int exfat_dirty(struct exfat* ef, bool dirty);
 int exfat_mount(struct exfat* ef, const char* spec, const char* options);
 void exfat_unmount(struct exfat* ef);
 
