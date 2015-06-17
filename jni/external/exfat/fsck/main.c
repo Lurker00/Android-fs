@@ -131,7 +131,7 @@ static void fsck(struct exfat* ef)
 
 static void usage(const char* prog)
 {
-	fprintf(stderr, "Usage: %s [-Vn] <device>\n", prog);
+	fprintf(stderr, "Usage: %s [-Vf] <device>\n", prog);
 	exit(1);
 }
 
@@ -140,20 +140,20 @@ int exfatfsck_main(int argc, char* argv[])
 	int opt;
 	const char* spec = NULL;
 	struct exfat ef;
-	bool no_fix = false;
+	bool do_fix = false;
 
 	printf("exfatfsck %u.%u.%u\n",
 			EXFAT_VERSION_MAJOR, EXFAT_VERSION_MINOR, EXFAT_VERSION_PATCH);
 
-	while ((opt = getopt(argc, argv, "Vn")) != -1)
+	while ((opt = getopt(argc, argv, "Vf")) != -1)
 	{
 		switch (opt)
 		{
 		case 'V':
 			puts("Copyright (C) 2011-2014  Andrew Nayenko");
 			return 0;
-		case 'n':
-			no_fix = true;
+		case 'f':
+			do_fix = true;
 			break;
 		default:
 			usage(argv[0]);
@@ -174,7 +174,7 @@ int exfatfsck_main(int argc, char* argv[])
 
 	puts("File system checking finished.");
 
-	if ( !no_fix && exfat_errors == 0 && (le16_to_cpu(ef.sb->volume_state) & EXFAT_STATE_MOUNTED) != 0 )
+	if ( do_fix && exfat_errors == 0 && (le16_to_cpu(ef.sb->volume_state) & EXFAT_STATE_MOUNTED) != 0 )
 	{
 		puts("Closing the volume...");
 		exfat_unmount(&ef);
@@ -184,6 +184,7 @@ int exfatfsck_main(int argc, char* argv[])
 			puts("No errors found.");
 			return 0;
 		}
+		ef.was_dirty = false; // The following unmount will clear EXFAT_STATE_MOUNTED!
 		puts("Done!");
 	}
 
