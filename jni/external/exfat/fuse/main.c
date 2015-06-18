@@ -210,7 +210,7 @@ static int fuse_exfat_read(const char* path, char* buffer, size_t size,
 	if ( ef.sync )
 #endif
 	{
-		if ( !ef.ro && (node->flags & EXFAT_ATTRIB_DIRTY) != 0 )
+		if ( !ef.ro && ef.noatime && (node->flags & EXFAT_ATTRIB_DIRTY) != 0 )
 			exfat_flush_node(&ef, node);
 	}
 	return ret;
