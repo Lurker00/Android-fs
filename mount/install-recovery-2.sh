@@ -1,7 +1,12 @@
 #!/system/bin/sh
 
-#logfile=/data/local/tmp/exfat_mount.log
+logfile0=/data/local/tmp/exfat_mount.log
+#logfile=$logfile0
 logfile=/dev/null
+
+if [ -e $logfile0 ]; then
+	logfile=$logfile0
+fi
 
 echo '******' $(date) '******' >> $logfile
 echo 'id: ' $(id) >> $logfile 2>&1
