@@ -80,7 +80,7 @@ int exfat_cleanup_node(struct exfat* ef, struct exfat_node* node)
 		rc = exfat_truncate(ef, node, 0, true);
 		/* free the node even in case of error or its memory will be lost */
 		free(node);
-#if !defined(ALWAYS_FLUSH_CMAP) || !ALWAYS_FLUSH_CMAP
+#if !defined(ALWAYS_USE_SYNC_OPTION) || !ALWAYS_USE_SYNC_OPTION
 		if ( ef->sync )
 #endif
 			exfat_flush_cmap(ef);
@@ -604,7 +604,7 @@ int exfat_flush_node(struct exfat* ef, struct exfat_node* node)
 
 	if (!(node->flags & EXFAT_ATTRIB_DIRTY))
 	{
-#if !defined(ALWAYS_FLUSH_CMAP) || !ALWAYS_FLUSH_CMAP
+#if !defined(ALWAYS_USE_SYNC_OPTION) || !ALWAYS_USE_SYNC_OPTION
 		if ( ef->sync )
 #endif
 			exfat_flush_cmap(ef);
@@ -667,7 +667,7 @@ int exfat_flush_node(struct exfat* ef, struct exfat_node* node)
 
 	node->flags &= ~EXFAT_ATTRIB_DIRTY;
 
-#if !defined(ALWAYS_FLUSH_CMAP) || !ALWAYS_FLUSH_CMAP
+#if !defined(ALWAYS_USE_SYNC_OPTION) || !ALWAYS_USE_SYNC_OPTION
 	if ( ef->sync )
 #endif
 		exfat_flush_cmap(ef);

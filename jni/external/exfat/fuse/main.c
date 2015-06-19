@@ -206,7 +206,7 @@ static int fuse_exfat_read(const char* path, char* buffer, size_t size,
 	ret = exfat_generic_pread(&ef, node, buffer, size, offset);
 	if (ret < 0)
 		return -EIO;
-#if !defined(ALWAYS_FLUSH_CMAP) || !ALWAYS_FLUSH_CMAP
+#if !defined(ALWAYS_USE_SYNC_OPTION) || !ALWAYS_USE_SYNC_OPTION
 	if ( ef.sync )
 #endif
 	{
@@ -230,7 +230,7 @@ static int fuse_exfat_write(const char* path, const char* buffer, size_t size,
 	if (ret < 0)
 		return -EIO;
 
-#if !defined(ALWAYS_FLUSH_CMAP) || !ALWAYS_FLUSH_CMAP
+#if !defined(ALWAYS_USE_SYNC_OPTION) || !ALWAYS_USE_SYNC_OPTION
 	if ( ef->sync )
 #endif
 	{

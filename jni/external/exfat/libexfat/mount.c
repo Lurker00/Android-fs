@@ -162,7 +162,7 @@ static int prepare_super_block(struct exfat* ef)
 	if (ef->ro)
 		return 0;
 
-#if !defined(ALWAYS_FLUSH_CMAP) || !ALWAYS_FLUSH_CMAP
+#if !defined(ALWAYS_USE_SYNC_OPTION) || !ALWAYS_USE_SYNC_OPTION
 	if ( !ef->sync )
 	{
 		ef->sb->volume_state = cpu_to_le16(
@@ -230,7 +230,7 @@ int exfat_dirty(struct exfat* ef, bool dirty)
 {
 	if (ef->ro)
 		return 0;
-#if !defined(ALWAYS_FLUSH_CMAP) || !ALWAYS_FLUSH_CMAP
+#if !defined(ALWAYS_USE_SYNC_OPTION) || !ALWAYS_USE_SYNC_OPTION
 	if ( !ef->sync )
 		return 0;
 #endif
