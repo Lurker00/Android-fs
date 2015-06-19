@@ -146,7 +146,7 @@ static int commit_super_block(struct exfat* ef)
 		ef->was_dirty = true; // Leaves the volume "mounted", to force chkdsk on it.
 		return 1;
 	}
-	return exfat_fsync(ef->dev);
+	return 0;
 }
 
 static int prepare_super_block(struct exfat* ef)
@@ -166,7 +166,9 @@ static int prepare_super_block(struct exfat* ef)
 	{
 		ef->sb->volume_state = cpu_to_le16(
 				le16_to_cpu(ef->sb->volume_state) | EXFAT_STATE_MOUNTED);
-		return commit_super_block(ef);
+		int rc1 = commit_super_block(ef);
+		int rc2 = exfat_fsync(ef->dev);
+		return rc2 == 0 ? rc1 : rc2;
 	}
 #endif
 	return 0;
@@ -204,7 +206,11 @@ static int finalize_super_block(struct exfat* ef)
 	}
 
 	if ( changed )
-		return commit_super_block(ef);
+	{
+		int rc1 = commit_super_block(ef);
+		int rc2 = exfat_fsync(ef->dev);
+		return rc2 == 0 ? rc1 : rc2;
+	}
 	else
 		return 0;
 }
@@ -434,6 +440,7 @@ void exfat_unmount(struct exfat* ef)
 	free(ef->root);
 	ef->root = NULL;
 	finalize_super_block(ef);
+	exfat_fsync(ef->dev);
 	exfat_close(ef->dev);	/* close descriptor immediately after fsync */
 	ef->dev = NULL;
 	free(ef->zero_cluster);
