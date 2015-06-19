@@ -9,6 +9,6 @@ The changes made are:
 * Bionic headers don't define obsolete `S_IREAD`, `S_IWRITE`, `S_IEXEC`.
 * Original sources failed to compile with `IGNORE_MTAB` defined.
 * Android NDK x86 libc has missing `ffs()` function, so I had to undefine `HAVE_FFS`.
-* Starting from 1.0.4, Android build is default to "`noatime`" option, and ignores other values ("`atime`", "relatime`") provided from the command line.
+* Starting from 1.0.4, Android build is default to "`noatime`" option, and ignores other values ("`atime`", "`relatime`") provided from the command line.
 
 **TODO:** Android file managers don't follow symlinks on user storages. I'd try to implement a mount option to resolve symlinks at the driver side, transparently for applications.
