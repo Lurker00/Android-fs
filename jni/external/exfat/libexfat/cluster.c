@@ -64,7 +64,7 @@ static cluster_t s2c(const struct exfat* ef, off64_t sector)
 /*
  * Size in bytes to size in clusters (rounded upwards).
  */
-static uint32_t bytes2clusters(const struct exfat* ef, uint64_t bytes)
+uint32_t exfat_bytes2clusters(const struct exfat* ef, uint64_t bytes)
 {
 	uint64_t cluster_size = CLUSTER_SIZE(*ef->sb);
 	return (bytes + cluster_size - 1) / cluster_size;
@@ -173,6 +173,8 @@ bool exfat_flush_cmap(struct exfat* ef)
 		}
 		ef->cmap.dirty = false;
 	}
+	if ( ef->in_write )
+		return true;
 	return exfat_dirty(ef, false) == 0;
 }
 
@@ -413,8 +415,8 @@ static int erase_range(struct exfat* ef, struct exfat_node* node,
 int exfat_truncate(struct exfat* ef, struct exfat_node* node, uint64_t size,
 		bool erase)
 {
-	uint32_t c1 = bytes2clusters(ef, node->size);
-	uint32_t c2 = bytes2clusters(ef, size);
+	uint32_t c1 = exfat_bytes2clusters(ef, node->size);
+	uint32_t c2 = exfat_bytes2clusters(ef, size);
 	int rc = 0;
 
 	if (node->references == 0 && node->parent)

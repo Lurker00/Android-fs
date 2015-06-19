@@ -151,6 +151,7 @@ static int commit_super_block(struct exfat* ef)
 
 static int prepare_super_block(struct exfat* ef)
 {
+	ef->bytes_written = 0;
 	if (le16_to_cpu(ef->sb->volume_state) & EXFAT_STATE_MOUNTED)
 	{
 		exfat_warn("volume was not unmounted cleanly");
@@ -167,7 +168,7 @@ static int prepare_super_block(struct exfat* ef)
 		ef->sb->volume_state = cpu_to_le16(
 				le16_to_cpu(ef->sb->volume_state) | EXFAT_STATE_MOUNTED);
 		int rc1 = commit_super_block(ef);
-		int rc2 = exfat_fsync(ef->dev);
+		int rc2 = exfat_sync(ef);
 		return rc2 == 0 ? rc1 : rc2;
 	}
 #endif
@@ -208,7 +209,7 @@ static int finalize_super_block(struct exfat* ef)
 	if ( changed )
 	{
 		int rc1 = commit_super_block(ef);
-		int rc2 = exfat_fsync(ef->dev);
+		int rc2 = exfat_sync(ef);
 		return rc2 == 0 ? rc1 : rc2;
 	}
 	else
@@ -243,9 +244,9 @@ int exfat_dirty(struct exfat* ef, bool dirty)
 	else if ( !dirty && (le16_to_cpu(ef->sb->volume_state) & EXFAT_STATE_MOUNTED) != 0 )
 	{
 		if ( ef->was_dirty )
-			return exfat_fsync(ef->dev);
+			return exfat_sync(ef);
 
-		if (ef->cmap.dirty)
+		if ( ef->cmap.dirty )
 			return 0;
 
 		// Root directory can be marked as dirty, but it has no metadata to flush!
@@ -433,7 +434,7 @@ void exfat_unmount(struct exfat* ef)
 	free(ef->root);
 	ef->root = NULL;
 	finalize_super_block(ef);
-	exfat_fsync(ef->dev);
+	exfat_sync(ef);
 	exfat_close(ef->dev);	/* close descriptor immediately after fsync */
 	ef->dev = NULL;
 	free(ef->zero_cluster);

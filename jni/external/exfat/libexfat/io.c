@@ -282,6 +282,12 @@ int exfat_fsync(struct exfat_dev* dev)
 	return rc;
 }
 
+int exfat_sync(struct exfat* ef)
+{
+	ef->bytes_written = 0;
+	return exfat_fsync(ef->dev);
+}
+
 enum exfat_mode exfat_get_mode(const struct exfat_dev* dev)
 {
 	return dev->mode;

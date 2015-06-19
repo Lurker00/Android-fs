@@ -192,7 +192,7 @@ static int fuse_exfat_fsync(const char* path, int datasync,
 	rc = exfat_flush(&ef);
 	if (rc != 0)
 		return rc;
-	return exfat_fsync(ef.dev);
+	return exfat_sync(&ef);
 }
 
 static int fuse_exfat_read(const char* path, char* buffer, size_t size,
@@ -219,13 +219,44 @@ static int fuse_exfat_read(const char* path, char* buffer, size_t size,
 static int fuse_exfat_write(const char* path, const char* buffer, size_t size,
 		off64_t offset, struct fuse_file_info* fi)
 {
-	ssize_t ret;
-
+	struct exfat_node* node = get_node(fi);
 	exfat_debug("[%s] %s (%zu bytes)", __func__, path, size);
 	exfat_dirty(&ef, true);
-	ret = exfat_generic_pwrite(&ef, get_node(fi), buffer, size, offset);
+
+	uint32_t c1 = exfat_bytes2clusters(&ef, node->size);
+	ssize_t ret = exfat_generic_pwrite(&ef, node, buffer, size, offset);
+	uint32_t c2 = exfat_bytes2clusters(&ef, node->size);
+
 	if (ret < 0)
 		return -EIO;
+
+#if !defined(ALWAYS_FLUSH_CMAP) || !ALWAYS_FLUSH_CMAP
+	if ( ef->sync )
+#endif
+	{
+		if ( c1 != c2 )
+		{
+			// Keep FAT, free clusters map and metadata consistent,
+			// but don't close the volume, and don't sync!
+			// Here we sacrifice the consistency for the sake of write performance :(
+			// But we may end up with inconsistent cmap/FAT/metadata only on power loss
+			// or card removal during the long write.
+			ef.in_write = true;
+			int rc = exfat_flush_node(&ef, node);
+			ef.in_write = false;
+			if ( rc != 0 )
+				return -1;
+		}
+		ef.bytes_written += ret;
+		if ( (offset < 1024*1024 && c1 != c2) // every new cluster for small files, or at the file beginning
+		  || (offset < 16*1024*1024 && ef.bytes_written >= 2*1024*1024)
+		  || (offset < 32*1024*1024 && ef.bytes_written >= 8*1024*1024)
+		   )
+		{
+			// Sync every so many bytes written, but not for files >32 MB.
+			exfat_sync(&ef);
+		}
+	}
 	return ret;
 }
 
@@ -382,27 +413,27 @@ static void usage(const char* prog)
 
 static struct fuse_operations fuse_exfat_ops =
 {
-	.getattr	= fuse_exfat_getattr,
-	.truncate	= fuse_exfat_truncate,
-	.readdir	= fuse_exfat_readdir,
-	.open		= fuse_exfat_open,
-	.release	= fuse_exfat_release,
-	.flush		= fuse_exfat_flush,
-	.fsync		= fuse_exfat_fsync,
-	.fsyncdir	= fuse_exfat_fsync,
-	.read		= fuse_exfat_read,
-	.write		= fuse_exfat_write,
-	.unlink		= fuse_exfat_unlink,
-	.rmdir		= fuse_exfat_rmdir,
-	.mknod		= fuse_exfat_mknod,
-	.mkdir		= fuse_exfat_mkdir,
-	.rename		= fuse_exfat_rename,
-	.utimens	= fuse_exfat_utimens,
-	.chmod		= fuse_exfat_chmod,
-	.chown		= fuse_exfat_chown,
-	.statfs		= fuse_exfat_statfs,
-	.init		= fuse_exfat_init,
-	.destroy	= fuse_exfat_destroy,
+	.getattr  = fuse_exfat_getattr,
+	.truncate = fuse_exfat_truncate,
+	.readdir  = fuse_exfat_readdir,
+	.open     = fuse_exfat_open,
+	.release  = fuse_exfat_release,
+	.flush    = fuse_exfat_flush,
+	.fsync    = fuse_exfat_fsync,
+	.fsyncdir = fuse_exfat_fsync,
+	.read     = fuse_exfat_read,
+	.write    = fuse_exfat_write,
+	.unlink   = fuse_exfat_unlink,
+	.rmdir    = fuse_exfat_rmdir,
+	.mknod    = fuse_exfat_mknod,
+	.mkdir    = fuse_exfat_mkdir,
+	.rename   = fuse_exfat_rename,
+	.utimens  = fuse_exfat_utimens,
+	.chmod    = fuse_exfat_chmod,
+	.chown    = fuse_exfat_chown,
+	.statfs   = fuse_exfat_statfs,
+	.init     = fuse_exfat_init,
+	.destroy  = fuse_exfat_destroy,
 };
 
 static char* add_option(char* options, const char* name, const char* value)

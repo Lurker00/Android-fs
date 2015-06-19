@@ -114,6 +114,8 @@ struct exfat
 	bool noatime;
 	bool sync;
 	bool was_dirty;
+	bool in_write;
+	uint64_t bytes_written;
 };
 
 /* in-core nodes iterator */
@@ -139,6 +141,7 @@ void exfat_debug(const char* format, ...) PRINTF;
 struct exfat_dev* exfat_open(const char* spec, enum exfat_mode mode);
 int exfat_close(struct exfat_dev* dev);
 int exfat_fsync(struct exfat_dev* dev);
+int exfat_sync(struct exfat* ef);
 enum exfat_mode exfat_get_mode(const struct exfat_dev* dev);
 off64_t exfat_get_size(const struct exfat_dev* dev);
 off64_t exfat_seek(struct exfat_dev* dev, off64_t offset, int whence);
@@ -163,6 +166,7 @@ int exfat_split(struct exfat* ef, struct exfat_node** parent,
 		struct exfat_node** node, le16_t* name, const char* path);
 
 off64_t exfat_c2o(const struct exfat* ef, cluster_t cluster);
+uint32_t exfat_bytes2clusters(const struct exfat* ef, uint64_t bytes);
 cluster_t exfat_next_cluster(const struct exfat* ef,
 		const struct exfat_node* node, cluster_t cluster);
 cluster_t exfat_advance_cluster(const struct exfat* ef,
