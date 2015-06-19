@@ -234,24 +234,17 @@ int exfat_dirty(struct exfat* ef, bool dirty)
 		return 0;
 #endif
 
-	// was_dirty can be set by write errors. Allow to mark the volume "mounted"
-	// for such situations.
-	if ( ef->was_dirty && !dirty )
-		return 0;
-
-	if ( dirty )
+	if ( dirty && (le16_to_cpu(ef->sb->volume_state) & EXFAT_STATE_MOUNTED) == 0 )
 	{
-		if ( (le16_to_cpu(ef->sb->volume_state) & EXFAT_STATE_MOUNTED) == 0 )
-		{
-			ef->sb->volume_state = cpu_to_le16(
-					le16_to_cpu(ef->sb->volume_state) | EXFAT_STATE_MOUNTED);
-			return commit_super_block(ef);
-		}
-		else
-			return 0;
+		ef->sb->volume_state = cpu_to_le16(
+				le16_to_cpu(ef->sb->volume_state) | EXFAT_STATE_MOUNTED);
+		return commit_super_block(ef);
 	}
-	else if ( (le16_to_cpu(ef->sb->volume_state) & EXFAT_STATE_MOUNTED) != 0 )
+	else if ( !dirty && (le16_to_cpu(ef->sb->volume_state) & EXFAT_STATE_MOUNTED) != 0 )
 	{
+		if ( ef->was_dirty )
+			return exfat_fsync(ef->dev);
+
 		if (ef->cmap.dirty)
 			return 0;
 
