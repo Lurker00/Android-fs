@@ -87,11 +87,11 @@ fi
 # ***** Mount for rw only if the file system is not damaged.
 options_ro="ro,uid=1023,gid=1023,umask=0000"
 options_rw="rw,uid=1023,gid=1023,umask=0000,noatime"
-mnt_cmd="$mount -o $options_rw $device /mnt/media_rw/sdcard1"
+mnt_cmd="$mount -o $options_rw $device $SECONDARY_STORAGE"
 
 $fsck $fsck_ops $device >> $logfile 2>&1
 if [ $? != 0 ]; then
-	mnt_cmd="$mount -o $options_ro $device /mnt/media_rw/sdcard1"
+	mnt_cmd="$mount -o $options_ro $device $SECONDARY_STORAGE"
 fi
 echo "$mnt_cmd" >> $logfile
 
